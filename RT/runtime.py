@@ -1,5 +1,5 @@
 import os
-import commands
+import subprocess
 from ftplib import FTP
 
 
@@ -12,14 +12,18 @@ class RunTime:
         self.agent = agent
 
     def execute_service(self, service):
+        print("Execute service")
         code = service["code"]
         params = service.get("params")
         try:
             if not self.has_service_code(code):
+                print("Voy a descargar de FTP")
                 self.get_remote_file(code)
-                output = commands.getoutput("python " + code)
+                print("Ya he descargado")
+                output = subprocess.getoutput("python " + code)
                 status = "success"
-        except:
+        except Exception as e:
+            print(e)
             status = "error"
             output = ""
         finally:

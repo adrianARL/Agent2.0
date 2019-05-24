@@ -3,6 +3,7 @@ import pickle
 from threading import Thread
 from TRM.topology_manager import TopologyManager
 from SEX.service_execution import ServiceExecution
+from RT.runtime import RunTime
 
 
 class Agent:
@@ -12,6 +13,7 @@ class Agent:
         self.services = [] # list of services ids {'id': service_id}
         self.topology_manager = TopologyManager(self.node_info["ipDB"], self.node_info["portDB"])
         self.service_execution = ServiceExecution(self)
+        self.runtime = RunTime(self)
         self.register_to_DB()
         self.socket_leader =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket_alive =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -79,7 +81,6 @@ class Agent:
         }
         self.socket_leader.send(pickle.dumps(attributes))
         self.socket_alive.send(pickle.dumps(attributes))
-        print("He enviado {}".format(attributes.items()))
 
     def send_message(self, message):
         self.socket_leader.send(message.encode())
@@ -112,7 +113,7 @@ class Agent:
     def add_service(self, service_id):
         print("Add service " + service_id)
         service_info = {
-            'id': service_id,
+            'service_id': service_id,
             'agent_id': self.node_info['nodeID']
         }
         self.services.append(service_info)
