@@ -28,6 +28,7 @@ class RunTime:
             output = ""
         finally:
             result = {
+                "type": "service_result"
                 "id": service["id"],
                 "status": status,
                 "output": output
