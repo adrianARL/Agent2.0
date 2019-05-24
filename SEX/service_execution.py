@@ -12,6 +12,7 @@ class ServiceExecution:
         self.th_attend_services = []
         self.service_ids = {}
         Thread(target=self.wait_services).start()
+        Thread(target=self.process_results).start()
 
     def generate_id(self):
         random_id = uuid.uuid4()
@@ -28,8 +29,10 @@ class ServiceExecution:
                     result = self.agent.runtime.execute_service(service)
                     if "id" in service.keys():
                         if self.agent.node_info["role"] != "agent":
-                            id = service["id"]
-                            self.agent.send_dict_to(result, self.service_ids[id])
+                            id = service["origin_id"]
+                            agent_id = self.service_ids[id]["agent_id"]
+                            result["id"] = self.service_ids[id]["origin_id"]
+                            self.agent.send_dict_to(result, agent_id)
                         else:
                             self.agent.send_dict(result)
                 elif(self.agent.node_info['role'] != "agent"):
@@ -73,3 +76,13 @@ class ServiceExecution:
             return set(service["IoT"]).issubset(set(node_info["IoT"]))
         except:
             return False
+
+    def process_results(self):
+        while True:
+            if len(self.agent.services_results) > 0:
+                service_result = self.agent.services_results.pop(0)
+                if self.agent.node_info["role"] != "agent":
+                    id = service_result["id"]
+                    agent_id = self.service_ids[id]["agent_id"]
+                    service_result["id"] = self.service_ids[id]["origin_id"]
+                    self.agent.send_dict_to(service_result, agent_id)

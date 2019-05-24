@@ -110,7 +110,8 @@ class Leader(Agent):
             print("He recibido el servicio {}".format(dict.items()))
             self.services.append(dict)
         elif dict["type"] == "service_result":
-            
+            print("Resultado: ", dict.items())
+            self.services_results.append(dict)
 
     def send_dict_to(self, dict, agent_id):
         self.agents[agent_id].send(pickle.dumps(dict))
