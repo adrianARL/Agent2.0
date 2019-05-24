@@ -5,7 +5,8 @@ from ftplib import FTP
 
 class RunTime:
 
-    FTP_SERVER = '10.1.136.179'
+    # FTP_SERVER = '10.1.136.179'
+    FTP_SERVER = '192.168.1.37'
 
     def __init__(self, agent):
         self.agent = agent
