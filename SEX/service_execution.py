@@ -37,13 +37,18 @@ class ServiceExecution:
                     random_id = self.generate_id()
                     service["origin_id"] = service["id"]
                     service["id"] = random_id
-                    self.service_ids[origin_id] = service['agent_id']
+                    self.service_ids[random_id] = {
+                        "origin_id": service['origin_id'],
+                        "agent_id": service['agent_id']
+                    }
                     th_attend_service = Thread(target=self.attend_service, args=(service, ))
                     th_attend_service.start()
                     self.th_attend_services.append(th_attend_service)
                 else:
                     # print("Delego el servicio al leader {}".format(service.items()))
                     service["type"] = "service"
+                    if "id" in service:
+                        service["origin_id"] = service["id"]
                     service["id"] = self.generate_id()
                     self.agent.send_dict(service)
 
