@@ -33,16 +33,18 @@ class ServiceExecution:
                         else:
                             self.agent.send_dict(result)
                 elif(self.agent.node_info['role'] != "agent"):
-                    print("Delego el servicio a un agent {}".format(service.items()))
+                    # print("Delego el servicio a un agent {}".format(service.items()))
                     random_id = self.generate_id()
+                    service["origin_id"] = service["id"]
                     service["id"] = random_id
-                    self.service_ids[random_id] = service['agent_id']
+                    self.service_ids[origin_id] = service['agent_id']
                     th_attend_service = Thread(target=self.attend_service, args=(service, ))
                     th_attend_service.start()
                     self.th_attend_services.append(th_attend_service)
                 else:
-                    print("Delego el servicio al leader {}".format(service.items()))
+                    # print("Delego el servicio al leader {}".format(service.items()))
                     service["type"] = "service"
+                    service["id"] = self.generate_id()
                     self.agent.send_dict(service)
 
     def attend_service(self, service):
