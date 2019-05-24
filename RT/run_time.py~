@@ -1,0 +1,367 @@
+from frontend_connection import FrontendConnection
+from requests.exceptions import ConnectionError
+from threading import Thread
+import serial
+import json
+import pickle
+import time
+import sqlite3
+
+
+class RunTime:
+
+    HOST_FRONTEND = '10.0.2.16'
+    PORT_FRONTEND = 3001
+
+    traffic_light_status = {
+        "TW1" : "",
+        "TW2" : "",
+        "TS1" : ""
+    }
+
+    traffic_light_color = {
+        "1000" : "green",
+        "0100" : "yellow",
+        "0010" : "red",
+        "0001" : "blue",
+        "1002" : "emergency"
+    }
+
+    # Propiedades y caracteristicas de los agentes que representa este script
+    tw1 = {
+        "id" : "TW1",
+        "type" : "trafficlight",
+        "positioning" : "rfid",
+        "x" : 139,
+        "y" : 480,
+        "direction" : "left",
+        "orientation" : "v",
+        "status" : "green",
+        "description" : "Semaforo",
+        "attributtes" : {
+            "role" : "agent",
+            "leader" : "TW2",
+            "resources" : {
+                "CPU" : "1,5GHz",
+                "Chipset" : "DDR4",
+                "DISK" : 5
+            },
+            "iots" : {}
+        }
+    }
+
+    tw2 = {
+        "id" : "TW2",
+        "type" : "trafficlight",
+        "positioning" : "rfid",
+        "x" : 261,
+        "y" : 447,
+        "long" : 60/2,
+        "direction" : "left",
+        "orientation" : "h",
+        "status" : "red",
+        "description" : "Semaforo",
+        "attributtes" : {
+            "role" : "leader",
+            "leader" : "",
+            "resources" : {
+                "CPU" : "1,5GHz",
+                "Chipset" : "DDR4",
+                "DISK" : 5
+            },
+            "iots" : {}
+        }
+    }
+
+    ts1 = {
+        "id" : "TS1",
+        "type" : "trafficlight",
+        "positioning" : "rfid",
+        "x" : 591,
+        "y" : 817,
+        "direction" : "right",
+        "orientation" : "h",
+        "status" : "red",
+        "description" : "Semaforo",
+        "attributtes" : {
+            "role" : "agent",
+            "leader" : "TW2",
+            "resources" : {
+                "CPU" : "1,5GHz",
+                "Chipset" : "DDR4",
+                "DISK" : 500
+            },
+            "iots" : {}
+        }
+    }
+
+    ts2 = {
+        "id" : "TS2",
+        "type" : "trafficlight",
+        "positioning" : "rfid",
+        "x" : 741,
+        "y" : 700,
+        "direction" : "left",
+        "orientation" : "h",
+        "status" : "red",
+        "description" : "Semaforo",
+        "attributtes" : {
+            "role" : "agent",
+            "leader" : "TW2",
+            "resources" : {
+                "CPU" : "1,5GHz",
+                "Chipset" : "DDR4",
+                "DISK" : 500
+            },
+            "iots" : {}
+        }
+    }
+
+    def __init__(self, agent):
+        arduino1 = serial.Serial('/dev/ttyACM0', 9600)
+        arduino2 = serial.Serial('/dev/ttyACM1', 9600)
+        self.arduinos = [arduino1, arduino2]
+        self.traffic_light_dict = self.load_traffic_lights()
+        self.nested_leaders = self.load_nested_leaders()
+        # self.streetlight_positions = self.load_streetlights()
+        self.emergency_dict = self.load_emergency_dict()
+        self.leader = agent
+        self.frontend = self.connect_frontend() # Conexion con FrontEnd
+        self.th_connection = Thread(target=self.accept_connection)
+        self.th_request = Thread(target=self.receive_request)
+        self.th_actions = Thread(target=self.actions)
+        self.th_light_status = Thread(target=self.read_traffic_light_status)
+        self.th_check_alive = Thread(target=self.check_alive_agents)
+        self.th_accept_alive = Thread(target=self.accept_alive)
+        if self.frontend:
+            self.th_front_traffic_light_status = Thread(target=self.receive_frontend_request)
+
+    def load_traffic_lights(self):
+        conn = sqlite3.connect('leader.db')
+        cursor = conn.cursor()
+        data = cursor.execute("select * from traffic_lights").fetchall()
+        trafficlights = {}
+        for light in data:
+            trafficlights[light[0]] = light[1]
+        return trafficlights
+
+    def load_nested_leaders(self):
+        conn = sqlite3.connect('leader.db')
+        cursor = conn.cursor()
+        data = cursor.execute("select * from nested_leaders").fetchall()
+        nested_leaders = {}
+        for leader in data:
+            nested_leaders[leader[0]] = (leader[1].split(',')[0], leader[1].split(',')[1])
+        return nested_leaders
+
+    def load_emergency_dict(self):
+        conn = sqlite3.connect('leader.db')
+        cursor = conn.cursor()
+        data = cursor.execute("select * from emergency_rfids").fetchall()
+        emergency_dict = {}
+        for emergency in data:
+            emergency_dict[emergency[0]] = emergency[1]
+        return emergency_dict
+
+    def connect_frontend(self):
+        try:
+            frontend = FrontendConnection(self.HOST_FRONTEND, self.PORT_FRONTEND) # Conexion con Frontend
+            frontend.recognizeAgent(self.tw1)
+            frontend.recognizeAgent(self.tw2)
+            frontend.recognizeAgent(self.ts1)
+            frontend.recognizeAgent(self.ts2)
+            print("Se ha conectado con el frontend")
+            return frontend
+        except:
+            print("El servidor frontend no esta conectado")
+            return None
+
+
+    def run(self):
+        try:
+            if self.frontend:
+                self.th_front_traffic_light_status.start()
+            self.th_connection.start()
+            self.th_accept_alive.start()
+            self.th_check_alive.start()
+            self.th_request.start()
+            self.th_actions.start()
+            self.th_light_status.start()
+        except KeyboardInterrupt:
+            pass
+        finally:
+            if self.frontend:
+                self.th_front_traffic_light_status.join()
+            self.th_connection.join()
+            self.th_request.join()
+            self.th_actions.join()
+            self.th_light_status.join()
+            self.self.leader.close_connection()
+
+    def check_alive_agents(self):
+        while True:
+            self.leader.send_broadcast_message()
+            time.sleep(2)
+
+    def accept_connection(self):
+        self.leader.accept_connection()
+
+    def accept_alive(self):
+        self.leader.accept_alive_connection()
+
+    def on_receive_status(self, *args):
+        data = args[0]
+        # print("Recibido cambio de estado para: "+data["agente_id"]+". Estado: "+data["status"])
+        if data["agente_id"] == "TW1":
+            code = '1'+data["status"]
+            self.arduinos[0].write(code.encode())
+        if data["agente_id"] == "TW2":
+            code = '2'+data["status"]
+            self.arduinos[0].write(code.encode())
+        if data["agente_id"] == "TS1":
+            code = '1'+data["status"]
+            self.arduinos[1].write(code.encode())
+        if data["agente_id"] == "TS2":
+            code = '2'+data["status"]
+            self.arduinos[1].write(code.encode())
+        self.frontend.sendStatus(data["agente_id"], data["status"])
+
+
+    def receive_frontend_request(self):
+        if self.frontend:
+           self.frontend.socket.on("front/agent/status", self.on_receive_status)
+        while True:
+            self.frontend.wait(1)
+
+    def set_traffic_light_service(self, data):
+        #print("Pongo el semaforo " + data + " en estado de emergencia")
+        #print(arduinos)
+        if data == "TW1":
+            self.arduinos[0].write('11002')
+            print("activado estado de emergencia en TW1")
+        elif data == "TW2":
+            self.arduinos[0].write('21002')
+            print("activado estado de emergencia en TW2")
+        elif data == "TS1":
+            self.arduinos[1].write('11002')
+            print("activado estado de emergencia en TS1")
+        elif data == "TS2":
+            self.arduinos[1].write('21002')
+            print("activado estado de emergencia en TS1")
+
+    def receive_request(self):
+        while True:
+            self.leader.request_received()
+
+    def actions(self):
+        while True:
+            try:
+                agent_id, msg = self.leader.RT_messages.pop()            
+                print("El mensaje es ", msg)
+                if msg == self.leader.TRAFFIC_LIGHT_REQUEST:
+                    info = json.dumps(self.traffic_light_dict, ensure_ascii=False)
+                    print("leader info:"+str(info))
+                    self.leader.answer_request(info, agent_id)
+                    print("enviado")
+                elif msg == self.leader.NESTED_LEADERS_REQUEST:
+                    info = json.dumps(self.nested_leaders, ensure_ascii=False)
+                    print("leader info:"+str(info))
+                    self.leader.answer_request(info, agent_id)
+                elif msg == self.leader.EMERGENCY_DICT_REQUEST:
+                    info = json.dumps(self.emergency_dict, ensure_ascii=False)
+                    print("leader info: " + str(info))
+                    self.leader.answer_request(info, agent_id)
+                elif msg.split("_")[0] == self.leader.REQUEST_TRAFFIC_LIGHT_STATUS:
+                    traffic_light = msg.split("_")[1]
+                    print("contesto: ", self.traffic_light_status[traffic_light])
+                    self.leader.answer_request(self.leader.RESPONSE_TRAFFIC_LIGHT_COLOR+"_"+self.traffic_light_status[traffic_light], agent_id)
+                    #print("traffic_light_status de " + traffic_light +" = "+self.traffic_light_status[traffic_light])
+                    print("contestado")
+                elif msg.split('_')[0] == self.leader.SET_TRAFFIC_LIGHT_SERVICE:
+                    print("setTrafficLightService")
+                    data = msg.split('_')[1]
+                    self.set_traffic_light_service(data)
+                elif msg.split('_')[0] == self.leader.REQUEST_ROUTE:
+                    print("requestRoute")
+                    start_position = msg.split('_')[1]
+                    end_position = msg.split('_')[2]
+                    if(self.leader.cloud_socket is None):
+                        th_SEX = Thread(target=self.get_shortest_route, args=(start_position, end_position, agent_id))
+                    else:
+                        th_SEX = Thread(target=self.get_shortest_route_from_cloud, args=(start_position, end_position, agent_id))
+                    th_SEX.start()
+                elif msg.split('_')[0] == self.leader.EMERGENCY_REQUEST:
+                    print("emergencyRequest")
+                    emergency_position = msg.split('_')[1]
+                    th_SEX = Thread(target=self.emergency_service, args=(emergency_position, None))
+                    th_SEX.start()
+            except Exception as e:
+                # print(e)
+                pass
+
+    def emergency_service(self, emergency_position, _):
+        print("EMERGENCIA EN LA POSICION: " + emergency_position)
+        ambulance, car_route, rfid_route = self.leader.SEX.search_nearest_ambulance(emergency_position)
+        if ambulance is not None:
+            self.leader.send_message(self.leader.EMERGENCY_SERVICE, ambulance)
+            info = json.dumps(car_route, ensure_ascii=False)
+            print("leader info:"+str(info))
+            self.leader.send_message(info, ambulance)
+            print("enviado")
+            time.sleep(0.5)
+            info = pickle.dumps(rfid_route)
+            print("leader info:"+str(info))
+            self.leader.send_message(info, ambulance)
+            print("enviado")
+        print("La ambulancia esta de camino!!!!")
+
+    def get_shortest_route_from_cloud(self, start_position, end_position, agent_id):
+        self.leader.send_message_to_cloud(self.leader.REQUEST_ROUTE+"_"+start_position+"_"+end_position)
+
+        response_route = self.leader.receive_message_from_cloud()
+        car_route = self.leader.receive_message_from_cloud()
+        rfid_route = self.leader.receive_message_from_cloud()
+
+        print("leader info: "+self.leader.RESPONSE_ROUTE)
+        self.leader.send_message(self.leader.RESPONSE_ROUTE, agent_id)
+        print("enviado")
+        print("leader info:"+str(car_route))
+        self.leader.send_message(car_route, agent_id)
+        print("enviado")
+        time.sleep(0.5)
+        print("leader info:"+str(rfid_route))
+        self.leader.send_message(rfid_route, agent_id)
+        print("enviado")
+
+    def get_shortest_route(self, start_position, end_position, agent_id):
+        car_route, rfid_route = self.leader.SEX.get_shortest_route(start_position, end_position)
+        print("leader info: "+self.leader.RESPONSE_ROUTE)
+        self.leader.send_message(self.leader.RESPONSE_ROUTE, agent_id)
+        print("enviado")
+        info = json.dumps(car_route, ensure_ascii=False)
+        print("leader info:"+str(info))
+        self.leader.send_message(info, agent_id)
+        print("enviado")
+        time.sleep(0.5)
+        info = pickle.dumps(rfid_route)
+        print("leader info:"+str(info))
+        self.leader.send_message(info, agent_id)
+        print("enviado")
+
+
+    def read_arduino_traffic_light_status(self, arduino, _):
+        while True:
+            try:
+                lectura = arduino.readline().decode().rstrip()
+                traffic_light, status= lectura.split('-')
+                self.traffic_light_status[traffic_light] = self.traffic_light_color[status]
+                if self.frontend:
+                    self.frontend.sendStatus(traffic_light, status)
+                print("traffic_light_status de " + traffic_light +" = "+self.traffic_light_status[traffic_light])
+            except:
+                pass
+
+    def read_traffic_light_status(self):
+        for arduino in self.arduinos:
+            thread = Thread(target=self.read_arduino_traffic_light_status, args=(arduino, None))
+            thread.start()
