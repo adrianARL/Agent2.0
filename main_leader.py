@@ -3,7 +3,7 @@ import psutil
 import subprocess
 
 node_id = {
-	"ipDB" : "10.0.2.16",
+	"ipDB" : "192.168.1.34",
 	# "ipDB" : "10.0.2.16",
 	"portDB" : 8000,
 	"device" : "Leader A",
