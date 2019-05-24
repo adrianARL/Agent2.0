@@ -32,7 +32,7 @@ class TopologyManager:
             PARAMS = "selec={'nodeID':"+"'"+nodeID+"'}"
             response = requests.get(self.get_URL, PARAMS)
             if response.status_code == 200:
-                return json.loads(json.loads(response.text)[0])
+                return json.loads(json.loads(response.text)[0])[0]
             else:
                 return None
         except:
@@ -40,7 +40,7 @@ class TopologyManager:
 
     def get_my_agents(self, zone):
         try:
-            PARAMS = "selec={'zone':"+"'"+zone+"'}"
+            PARAMS = "selec={'status':'1','zone':"+"'"+zone+"'}"
             response = requests.get(self.get_URL, PARAMS)
             if response.status_code == 200:
                 return json.loads(json.loads(response.text)[0])
@@ -65,7 +65,7 @@ class TopologyManager:
             PARAMS = "selec={'_id':"+"'"+service_id+"'}"
             response = requests.get(self.get_service_URL, PARAMS)
             if response.status_code == 200:
-                return json.loads(json.loads(response.text)[0])
+                return json.loads(json.loads(response.text)[0])[0]
             else:
                 return None
         except:

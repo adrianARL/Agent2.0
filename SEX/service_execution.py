@@ -46,14 +46,17 @@ class ServiceExecution:
                     self.agent.send_dict(service)
 
     def attend_service(self, service):
-        if "id" in service.keys():
-            reg_service = self.agent.topology_manager.get_service(service["id"])
+        if "service_id" in service.keys():
+            reg_service = self.agent.topology_manager.get_service(service["service_id"])
             agents = self.agent.topology_manager.get_my_agents(self.agent.node_info["zone"])
             if(agents):
                 for agent in agents:
+                    print("Agent : ", agent.get("IoT"))
+                    print("Service : ", reg_service.get("IoT"))
                     if(self.can_execute_service(reg_service, agent)):
-                        service_data = service
-                        self.agent.send_dict_to(service_data, agent["nodeID"])
+                        reg_service["id"] = service["id"]
+                        reg_service["type"] = service["type"]
+                        self.agent.send_dict_to(reg_service, agent["nodeID"])
                         break
 
 

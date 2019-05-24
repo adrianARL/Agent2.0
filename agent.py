@@ -19,6 +19,12 @@ class Agent:
             self.register_to_leader(self.node_info['leaderIP'], self.node_info['port'])
             self.receive_messages()
 
+
+    def __del__(self):
+        print("termino")
+        self.node_info["status"] = 0
+        self.update_DB_info()
+
 ######################### TRM OPERATIONS ##########################
 
     def register_to_DB(self):
