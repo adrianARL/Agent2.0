@@ -31,7 +31,6 @@ class Agent:
         else:
             print("El agent no se ha registrado en la base de datos")
 
-
     def update_DB_info(self):
         updated = self.topology_manager.update(self.node_info)
         if updated != 200:
