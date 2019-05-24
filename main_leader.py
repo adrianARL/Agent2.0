@@ -14,7 +14,8 @@ node_id = {
 	"broadcastIP" : subprocess.getoutput("ip a | grep inet | grep brd | awk '{print $4}'"),
 	"cpu" : psutil.cpu_percent(),
 	"ram" : psutil.virtual_memory()[2],
-	"status" : 1
+	"status" : 1,
+	"zone": "A"
 }
 
 leader = Leader(node_id)

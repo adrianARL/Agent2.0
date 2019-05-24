@@ -1,6 +1,7 @@
 import socket
 import random
 import pickle
+import time
 from threading import Thread
 from agent import Agent
 
@@ -99,11 +100,14 @@ class Leader(Agent):
 
     def process_dict(self, dict, agent_id):
         if dict["type"] == "register":
+            print("Entro en register")
             new_id = dict["id"]
             self.agents[new_id] = self.agents[agent_id]
             del self.agents[agent_id]
             self.topology_manager.update({'nodeID': new_id, 'zone': self.node_info['zone']})
+            print("He hecho update")
         elif dict["type"] == "service":
+            print("He recibido el servicio {}".format(dict.items()))
             self.services.append(dict)
 
     def send_dict_to(self, dict, agent_id):

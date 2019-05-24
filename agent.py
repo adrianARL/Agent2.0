@@ -29,12 +29,15 @@ class Agent:
         else:
             print("El agent no se ha registrado en la base de datos")
 
+
     def update_DB_info(self):
         updated = self.topology_manager.update(self.node_info)
         if updated != 200:
             print("El nodo {} no se ha podido actualizar".format(self.node_info['myIP']))
         else:
             print("El nodo {} se ha actualizado correctamente".format(self.node_info['myIP']))
+
+
 
     def remove_from_DB(self):
         deleted = self.topology_manager.delete(self.node_info['myIP'])
@@ -59,8 +62,8 @@ class Agent:
             self.socket_alive =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket_leader.connect((leaderIP, port))
             self.socket_alive.connect((leaderIP, port+1))
-            print("Me he conectado con el agent")
             self.send_register_message()
+            print("Me he conectado con el agent")
         except Exception as e:
             print(e)
             print("El agente no se ha podido conectar al leader")
@@ -100,6 +103,7 @@ class Agent:
     def process_received_dict(self, dict):
         if dict["type"] == "service":
             self.services.append(dict)
+            print("He recibido service {}".format(dict.items()))
         elif dict["type"] == "service_result":
             pass
 

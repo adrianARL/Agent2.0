@@ -23,10 +23,9 @@ class ServiceExecution:
         while True:
             if len(self.agent.services) > 0:
                 service = self.agent.services.pop(0)
-                print("He sacado de services {}".format(service))
                 if self.can_execute_service(service, self.agent.node_info):
-                    print("Puedo ejecutar el servicio {}".format(service))
-                    result = self.agent.runtime.execute_service(reg_service)
+                    print("Puedo ejecutar {}".format(service.items()))
+                    result = self.agent.runtime.execute_service(service)
                     if "id" in service.keys():
                         if self.agent.node_info["role"] != "agent":
                             id = service["id"]
@@ -34,28 +33,30 @@ class ServiceExecution:
                         else:
                             self.agent.send_dict(result)
                 elif(self.agent.node_info['role'] != "agent"):
-                    print("Soy leader y envio el servicio {} a un agent".format(service))
+                    print("Delego el servicio a un agent {}".format(service.items()))
                     random_id = self.generate_id()
                     service["id"] = random_id
                     self.service_ids[random_id] = service['agent_id']
-                    th_attend_service = Thread(target=self.attend_service, args=(service, None))
+                    th_attend_service = Thread(target=self.attend_service, args=(service, ))
                     th_attend_service.start()
                     self.th_attend_services.append(th_attend_service)
                 else:
-                    print("Soy agent y envio el servicio {} a mi leader".format(service))
+                    print("Delego el servicio al leader {}".format(service.items()))
                     service["type"] = "service"
                     self.agent.send_dict(service)
 
-    def attend_service(self, service, ):
+    def attend_service(self, service):
         if "id" in service.keys():
             reg_service = self.agent.topology_manager.get_service(service["id"])
             agents = self.agent.topology_manager.get_my_agents(self.agent.node_info["zone"])
             if(agents):
                 for agent in agents:
-                    if(can_execute_service(reg_service, agent)):
+                    if(self.can_execute_service(reg_service, agent)):
                         service_data = service
                         self.agent.send_dict_to(service_data, agent["nodeID"])
                         break
+
+
 
     def can_execute_service(self, service, node_info):
         try:
