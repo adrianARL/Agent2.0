@@ -113,6 +113,8 @@ class Agent:
             self.services.append(dict)
             print("He recibido service {}".format(dict.items()))
         elif dict["type"] == "service_result":
+            print("He recibido resultado de servicio")
+            print(dict.items())
             pass
 
 ######################## SOCKET OPERATIONS ########################
