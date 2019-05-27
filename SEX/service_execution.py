@@ -88,7 +88,7 @@ class ServiceExecution:
                     print("Respondo: ", service_result)
                     self.agent.send_dict_to(service_result, agent_id)
                 else:
-                    self.agent.send_dict(result)
+                    self.agent.send_dict(service_result)
 
 
     def fill_service(self, service, reg_service):
