@@ -120,7 +120,6 @@ class Agent:
 ######################## SOCKET OPERATIONS ########################
 
     def add_service(self, service_id):
-        print("Add service " + service_id)
         service_info = {
             'service_id': service_id,
             'agent_id': self.node_info['nodeID']
