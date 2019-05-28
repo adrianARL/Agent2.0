@@ -11,7 +11,9 @@ class Agent:
     def __init__(self, node_info):
         self.node_info = node_info
         self.services = [] # list of services ids {'id': service_id}
+        self.generated_services_id = []
         self.services_results = []
+        self.my_services_results = []
         self.topology_manager = TopologyManager(self.node_info["ipDB"], self.node_info["portDB"])
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
@@ -121,9 +123,25 @@ class Agent:
 
     def add_service(self, service_id, params=None):
         service_info = {
+            "type": "service",
+            "id": self.generate_service_id(),
             'service_id': service_id,
             'agent_id': self.node_info['nodeID']
         }
         if params:
             service_info['params'] = params
+
+        self.agent.generated_services_id.append(service_info["id"])
         self.services.append(service_info)
+        return service_info["id"]
+
+
+############################## UTILS ##############################
+
+    def generate_id(self):
+        random_id = uuid.uuid4()
+        if random_id in self.generated_services_id:
+            return self.generate_id()
+        return random_id
+
+############################## UTILS ##############################
