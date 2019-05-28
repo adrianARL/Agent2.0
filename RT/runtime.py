@@ -22,7 +22,8 @@ class RunTime:
                 self.get_remote_file(code)
                 print("Ya he descargado")
             if params:
-                output = subprocess.getoutput("python ./codes/" + code + " " + pickle.dumps(params))
+                output = subprocess.getoutput("python ./codes/" + code + " " + " ".join(params))
+                # dentro del code.py que se ejecuta para obtener params: params = sys.argv[1].split(" ")
             else:
                 output = subprocess.getoutput("python ./codes/" + code)
             status = "success"
