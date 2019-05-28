@@ -9,7 +9,10 @@
 
 {
   'type': 'service',
-  datos del servicio...
+  'service_id': service_id,
+  'agent_id': agent_id,
+  'params': params (puede o no existir)
+  etc.
 }
 
 {
