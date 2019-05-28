@@ -22,7 +22,7 @@ class RunTime:
                 self.get_remote_file(code)
                 print("Ya he descargado")
             if service.get("is_infinite"):
-                Thread(target=self.execute_code, target=(code, params)).start()
+                Thread(target=self.execute_code, args=(code, params)).start()
             else:
                 output = self.execute_code(code, params)
             status = "success"
