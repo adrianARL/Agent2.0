@@ -21,11 +21,10 @@ class RunTime:
                 print("Voy a descargar de FTP")
                 self.get_remote_file(code)
                 print("Ya he descargado")
-            if params:
-                output = subprocess.getoutput("python ./codes/" + code + " " + " ".join(params))
-                # dentro del code.py que se ejecuta para obtener params: params = sys.argv[1].split(" ")
+            if service.get("is_infinite"):
+                Thread(target=self.execute_code, target=(code, params)).start()
             else:
-                output = subprocess.getoutput("python ./codes/" + code)
+                output = self.execute_code(code, params)
             status = "success"
         except Exception as e:
             print(e)
@@ -38,6 +37,14 @@ class RunTime:
                 "output": output
             }
         return result
+
+    def execute_code(self, code, params):
+        if params:
+            output = subprocess.getoutput("python ./codes/" + code + " " + " ".join(params))
+            # dentro del code.py que se ejecuta para obtener params: params = sys.argv[1].split(" ")
+        else:
+            output = subprocess.getoutput("python ./codes/" + code)
+        return output
 
     def get_remote_file(self, code):
         file = open("./codes/" + code, 'wb')
