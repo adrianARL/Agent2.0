@@ -131,8 +131,7 @@ class Agent:
         }
         if params:
             service_info['params'] = params
-
-        self.agent.generated_services_id.append(service_info["id"])
+        self.generated_services_id.append(service_info["id"])
         self.services.append(service_info)
         return service_info["id"]
 

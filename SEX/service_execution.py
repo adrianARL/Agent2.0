@@ -18,13 +18,16 @@ class ServiceExecution:
     def wait_services(self):
         while True:
             if len(self.agent.services) > 0:
+                print("Ento en services")
                 service = self.agent.services.pop(0)
                 if self.agent.node_info["role"] != "agent":
                     reg_service = self.agent.topology_manager.get_service(service["service_id"])
                     self.fill_service(service, reg_service)
                 if 'dependencies' in service.keys() and "dependencies_done" not in service.keys():
+                    print("Tiene dependencias")
                     Thread(target=self.attend_service_dependencies, args=(service, )).start()
                 else:
+                    print("No tiene dependencias")
                     if self.can_execute_service(service, self.agent.node_info):
                         print("Puedo ejecutar {}".format(service.items()))
                         result = self.agent.runtime.execute_service(service)
@@ -34,6 +37,8 @@ class ServiceExecution:
                         th_attend_service = Thread(target=self.attend_service, args=(service, ))
                         th_attend_service.start()
                         self.th_attend_services.append(th_attend_service)
+                    else:
+                        self.agent.send_dict(service)
 
 
 
