@@ -16,16 +16,19 @@ class RunTime:
         code = service["code"]
         params = service.get("params")
         try:
+            output = ""
             if not self.has_service_code(code):
                 print("Voy a descargar de FTP")
                 self.get_remote_file(code)
                 print("Ya he descargado")
-            output = subprocess.getoutput("python ./codes/" + code)
+            if params:
+                output = subprocess.getoutput("python ./codes/" + code + " " + pickle.dumps(params))
+            else:
+                output = subprocess.getoutput("python ./codes/" + code)
             status = "success"
         except Exception as e:
             print(e)
             status = "error"
-            output = ""
         finally:
             result = {
                 "type": "service_result",

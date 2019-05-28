@@ -1,0 +1,20 @@
+{
+  'type': 'register',
+  'id': id,
+  'port': port,
+  'cpu': cpu,
+  'ram': ram,
+  'id_group': ''
+}
+
+{
+  'type': 'service',
+  datos del servicio...
+}
+
+{
+  'type': 'service_result',
+  'id': service['id'],
+  'status': 'success'/'error'/'unattended',
+  'output': output
+}
