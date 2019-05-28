@@ -2,6 +2,7 @@ import socket
 import random
 import pickle
 import time
+import errno
 from threading import Thread
 from agent import Agent
 
@@ -62,13 +63,14 @@ class Leader(Agent):
             for agent_id in list(self.agents_alive):
                 try:
                     self.agents_alive[agent_id].send("check-alive".encode())
-                except Exception as e:
-                    if agent_id in self.agents.keys() and agent_id in self.agents_alive.keys():
-                        print("He detectado que el agent {} esta desconectado".format(agent_id))
-                        self.agents.pop(agent_id)
-                        self.agents_alive.pop(agent_id)
-                        self.topology_manager.update({'nodeID': agent_id, 'status': 0})
-                        print("He hecho update de {} a status 0".format(agent_id))
+                except IOError, e:
+                    if e.errno == errno.EPIPE:
+                        if agent_id in self.agents.keys() and agent_id in self.agents_alive.keys():
+                            print("He detectado que el agent {} esta desconectado".format(agent_id))
+                            self.agents.pop(agent_id)
+                            self.agents_alive.pop(agent_id)
+                            self.topology_manager.update({'nodeID': agent_id, 'status': 0})
+                            print("He hecho update de {} a status 0".format(agent_id))
 
     def receive_messages(self):
         th_messages = Thread(target=self.th_receive_messages)
