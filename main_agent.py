@@ -22,7 +22,9 @@ node_id = {
 
 agent = Agent(node_id)
 time.sleep(2)
-agent.add_service("TEST")
+
+params = {'start': 'NW', 'end': 'E4'}
+agent.add_service("TEST", params)
 
 while True:
 	pass

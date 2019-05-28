@@ -119,9 +119,11 @@ class Agent:
 
 ######################## SOCKET OPERATIONS ########################
 
-    def add_service(self, service_id):
+    def add_service(self, service_id, params=None):
         service_info = {
             'service_id': service_id,
             'agent_id': self.node_info['nodeID']
         }
+        if params:
+            service_info['params'] = params
         self.services.append(service_info)
