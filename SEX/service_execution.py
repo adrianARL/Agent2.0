@@ -35,7 +35,7 @@ class ServiceExecution:
                         result = self.agent.runtime.execute_service(service)
                         self.agent.services_results.append(result)
                     elif(self.agent.node_info["role"] != "agent"):
-                        # print("Delego el servicio a un agent {}".format(service.items()))
+                        print("Delego el servicio a un agent {}".format(service.items()))
                         th_attend_service = Thread(target=self.attend_service, args=(service, ))
                         th_attend_service.start()
                         self.th_attend_services.append(th_attend_service)
@@ -49,11 +49,6 @@ class ServiceExecution:
         dependencies = []
         for dependency in service["dependencies"]:
             dependencies.append(self.add_service(dependency))
-        print()
-        print()
-        print(dependencies)
-        print()
-        print()
         for dependency in dependencies:
             while True:
                 if dependency not in self.agent.generated_services_id:
@@ -73,28 +68,22 @@ class ServiceExecution:
 
 
     def attend_service(self, service):
-        if "service_id" in service.keys():
-            reg_service = self.agent.topology_manager.get_service(service["service_id"])
-            agents = self.agent.topology_manager.get_my_agents(self.agent.node_info["zone"])
-            attended = False
-            if(agents):
-                for agent in agents:
-                    print("Agent : ", agent.get("IoT"))
-                    print("Service : ", reg_service.get("IoT"))
-                    if(self.can_execute_service(reg_service, agent)):
-                        reg_service["id"] = service["id"]
-                        reg_service["type"] = service["type"]
-                        self.agent.send_dict_to(reg_service, agent["nodeID"])
-                        attended = True
-                        break
-            if not attended:
-                result = {
-                    "type": "service_result",
-                    "id": service["id"],
-                    "status": "unattended",
-                    "output": ""
-                }
-                self.agent.services_results.append(result)
+        agents = self.agent.topology_manager.get_my_agents(self.agent.node_info["zone"])
+        attended = False
+        if(agents):
+            for agent in agents:
+                if(self.can_execute_service(service, agent)):
+                    self.agent.send_dict_to(service, agent["nodeID"])
+                    attended = True
+                    break
+        if not attended:
+            result = {
+                "type": "service_result",
+                "id": service["id"],
+                "status": "unattended",
+                "output": ""
+            }
+            self.agent.services_results.append(result)
 
 
 
