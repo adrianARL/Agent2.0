@@ -109,7 +109,7 @@ class ServiceExecution:
                     self.agent.my_services_results.append(service_result)
                     print(self.agent.generated_services_id)
                     origin = self.service_ids.get(service_result["id"])
-                    if origin and origin["origin_id"] in self.agent.generated_services_id:
+                    if origin and origin["origin_id"] in self.agent.generated_services_id and origin["agent_id"] == self.agent.node_info["nodeID"]:
                         self.agent.generated_services_id.remove(origin["origin_id"])
                     self.agent.generated_services_id.remove(service_result["id"])
                     print("He removido ", service_result["id"])
