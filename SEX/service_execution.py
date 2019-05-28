@@ -61,6 +61,7 @@ class ServiceExecution:
     def add_service(self, service_id):
         reg_service = self.agent.topology_manager.get_service(service_id)
         random_id = self.agent.generate_service_id()
+        reg_service["type"] = "service"
         reg_service["id"] = random_id
         reg_service["service_id"] = reg_service["_id"]
         reg_service["agent_id"] = self.agent.node_info["nodeID"]
