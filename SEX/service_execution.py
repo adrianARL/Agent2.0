@@ -48,7 +48,7 @@ class ServiceExecution:
     def attend_service_dependencies(self, service):
         dependencies = []
         for dependency in service["dependencies"]:
-            dependencies.append(self.add_service(dependency))
+            dependencies.append(self.add_service(dependency, service.get("agent_id")))
         for dependency in dependencies:
             while True:
                 if dependency not in self.agent.generated_services_id:
@@ -58,13 +58,13 @@ class ServiceExecution:
 
 
 
-    def add_service(self, service_id):
+    def add_service(self, service_id, agent_id):
         reg_service = self.agent.topology_manager.get_service(service_id)
         random_id = self.agent.generate_service_id()
         reg_service["type"] = "service"
         reg_service["id"] = random_id
         reg_service["service_id"] = reg_service["_id"]
-        reg_service["agent_id"] = self.agent.node_info["nodeID"]
+        reg_service["agent_id"] = agent_id if agent_id else self.agent.node_info["nodeID"]
         self.agent.generated_services_id.append(random_id)
         self.agent.services.append(reg_service)
         return random_id
@@ -107,13 +107,13 @@ class ServiceExecution:
                 service_result = self.agent.services_results.pop(0)
                 if service_result["id"] in self.agent.generated_services_id:
                     self.agent.my_services_results.append(service_result)
-                    # print(self.agent.generated_services_id)
+                    print(self.agent.generated_services_id)
                     origin = self.service_ids.get(service_result["id"])
                     if origin and origin["origin_id"] in self.agent.generated_services_id:
                         self.agent.generated_services_id.remove(origin["origin_id"])
                     self.agent.generated_services_id.remove(service_result["id"])
-                    # print("He removido ", service_result["id"])
-                    # print(self.agent.generated_services_id)
+                    print("He removido ", service_result["id"])
+                    print(self.agent.generated_services_id)
                 else:
                     if self.agent.node_info["role"] != "agent":
                         id = service_result["id"]
