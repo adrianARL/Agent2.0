@@ -107,10 +107,13 @@ class ServiceExecution:
                 service_result = self.agent.services_results.pop(0)
                 if service_result["id"] in self.agent.generated_services_id:
                     self.agent.my_services_results.append(service_result)
-                    print(self.agent.generated_services_id)
+                    # print(self.agent.generated_services_id)
+                    origin = self.service_ids.get(service_result["id"])
+                    if origin and origin["origin_id"] in self.agent.generated_services_id:
+                        self.agent.generated_services_id.remove(origin["origin_id")
                     self.agent.generated_services_id.remove(service_result["id"])
-                    print("He removido ", service_result["id"])
-                    print(self.agent.generated_services_id)
+                    # print("He removido ", service_result["id"])
+                    # print(self.agent.generated_services_id)
                 else:
                     if self.agent.node_info["role"] != "agent":
                         id = service_result["id"]
