@@ -20,9 +20,9 @@ class ServiceExecution:
             if len(self.agent.services) > 0:
                 print("Ento en services")
                 service = self.agent.services.pop(0)
+                print(service)
+                print()
                 if self.agent.node_info["role"] != "agent" and not self.can_execute_service(service, self.agent.node_info):
-                    print("fill de puta!!!")
-                    print("fill de puta!!!")
                     reg_service = self.agent.topology_manager.get_service(service["service_id"])
                     self.fill_service(service, reg_service)
                 if 'dependencies' in service.keys() and "dependencies_done" not in service.keys():
@@ -62,6 +62,8 @@ class ServiceExecution:
         reg_service = self.agent.topology_manager.get_service(service_id)
         random_id = self.agent.generate_service_id()
         reg_service["id"] = random_id
+        reg_service["service_id"] = reg_service["_id"]
+        reg_service["agent_id"] = self.agent.node_info["nodeID"]
         self.agent.generated_services_id.append(random_id)
         self.agent.services.append(reg_service)
         return random_id

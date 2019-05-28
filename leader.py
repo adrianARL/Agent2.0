@@ -63,7 +63,7 @@ class Leader(Agent):
             for agent_id in list(self.agents_alive):
                 try:
                     self.agents_alive[agent_id].send("check-alive".encode())
-                except IOError, e:
+                except IOError as e:
                     if e.errno == errno.EPIPE:
                         if agent_id in self.agents.keys() and agent_id in self.agents_alive.keys():
                             print("He detectado que el agent {} esta desconectado".format(agent_id))
