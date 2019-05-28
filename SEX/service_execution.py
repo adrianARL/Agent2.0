@@ -20,7 +20,9 @@ class ServiceExecution:
             if len(self.agent.services) > 0:
                 print("Ento en services")
                 service = self.agent.services.pop(0)
-                if self.agent.node_info["role"] != "agent":
+                if self.agent.node_info["role"] != "agent" and not self.can_execute_service(service, self.agent.node_info):
+                    print("fill de puta!!!")
+                    print("fill de puta!!!")
                     reg_service = self.agent.topology_manager.get_service(service["service_id"])
                     self.fill_service(service, reg_service)
                 if 'dependencies' in service.keys() and "dependencies_done" not in service.keys():
@@ -46,17 +48,28 @@ class ServiceExecution:
     def attend_service_dependencies(self, service):
         dependencies = []
         for dependency in service["dependencies"]:
-            dependencies.append(self.agent.add_service(dependency))
-
+            dependencies.append(self.add_service(dependency))
+        print()
+        print()
+        print(dependencies)
+        print()
+        print()
         for dependency in dependencies:
             while True:
                 if dependency not in self.agent.generated_services_id:
                     break
         service["dependencies_done"] = True
-        self.agent.service.append(service)
+        self.agent.services.append(service)
 
 
 
+    def add_service(self, service_id):
+        reg_service = self.agent.topology_manager.get_service(service_id)
+        random_id = self.agent.generate_service_id()
+        reg_service["id"] = random_id
+        self.agent.generated_services_id.append(random_id)
+        self.agent.services.append(reg_service)
+        return random_id
 
 
     def attend_service(self, service):
@@ -87,6 +100,10 @@ class ServiceExecution:
 
 
     def can_execute_service(self, service, node_info):
+        print()
+        print(service.get("IoT"))
+        print(node_info.get("IoT"))
+        print()
         try:
             return set(service["IoT"]).issubset(set(node_info["IoT"]))
         except:
@@ -98,7 +115,10 @@ class ServiceExecution:
                 service_result = self.agent.services_results.pop(0)
                 if service_result["id"] in self.agent.generated_services_id:
                     self.agent.my_services_results.append(service_result)
+                    print(self.agent.generated_services_id)
                     self.agent.generated_services_id.remove(service_result["id"])
+                    print("He removido ", service_result["id"])
+                    print(self.agent.generated_services_id)
                 else:
                     if self.agent.node_info["role"] != "agent":
                         id = service_result["id"]
@@ -119,9 +139,6 @@ class ServiceExecution:
             "agent_id": service["agent_id"]
         }
         self.agent.generated_services_id.append(random_id)
-        print("fill service:")
-        print(self.service_ids)
-        print()
         for key in reg_service.keys():
             if not key in service.keys():
                 service[key] = reg_service[key]
