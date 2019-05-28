@@ -1,5 +1,6 @@
 import socket
 import pickle
+import uuid
 from threading import Thread
 from TRM.topology_manager import TopologyManager
 from SEX.service_execution import ServiceExecution
@@ -138,10 +139,10 @@ class Agent:
 
 ############################## UTILS ##############################
 
-    def generate_id(self):
+    def generate_service_id(self):
         random_id = uuid.uuid4()
         if random_id in self.generated_services_id:
-            return self.generate_id()
+            return self.generate_service_id()
         return random_id
 
 ############################## UTILS ##############################
