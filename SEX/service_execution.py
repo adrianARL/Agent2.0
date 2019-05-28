@@ -22,10 +22,13 @@ class ServiceExecution:
                 service = self.agent.services.pop(0)
                 print(service)
                 print()
+                print(self.service_ids)
+                print()
+                print()
                 if self.agent.node_info["role"] != "agent" and not self.can_execute_service(service, self.agent.node_info):
                     reg_service = self.agent.topology_manager.get_service(service["service_id"])
                     self.fill_service(service, reg_service)
-                if 'dependencies' in service.keys() and "dependencies_done" not in service.keys():
+                if 'dependencies' in service.keys() and self.can_execute_service(service, self.agent.node_info) and "dependencies_done" not in service.keys():
                     print("Tiene dependencias")
                     Thread(target=self.attend_service_dependencies, args=(service, )).start()
                 else:
@@ -48,7 +51,7 @@ class ServiceExecution:
     def attend_service_dependencies(self, service):
         dependencies = []
         for dependency in service["dependencies"]:
-            dependencies.append(self.add_service(dependency, service.get("agent_id")))
+            dependencies.append(self.add_service(dependency))
         for dependency in dependencies:
             while True:
                 if dependency not in self.agent.generated_services_id:
@@ -58,13 +61,13 @@ class ServiceExecution:
 
 
 
-    def add_service(self, service_id, agent_id):
+    def add_service(self, service_id):
         reg_service = self.agent.topology_manager.get_service(service_id)
         random_id = self.agent.generate_service_id()
         reg_service["type"] = "service"
         reg_service["id"] = random_id
         reg_service["service_id"] = reg_service["_id"]
-        reg_service["agent_id"] = agent_id if agent_id else self.agent.node_info["nodeID"]
+        reg_service["agent_id"] = self.agent.node_info["nodeID"]
         self.agent.generated_services_id.append(random_id)
         self.agent.services.append(reg_service)
         return random_id
@@ -109,7 +112,7 @@ class ServiceExecution:
                     self.agent.my_services_results.append(service_result)
                     print(self.agent.generated_services_id)
                     origin = self.service_ids.get(service_result["id"])
-                    if origin and origin["origin_id"] in self.agent.generated_services_id and origin["agent_id"] == self.agent.node_info["nodeID"]:
+                    if origin and origin["origin_id"] in self.agent.generated_services_id :
                         self.agent.generated_services_id.remove(origin["origin_id"])
                     self.agent.generated_services_id.remove(service_result["id"])
                     print("He removido ", service_result["id"])
