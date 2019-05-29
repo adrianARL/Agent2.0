@@ -25,9 +25,10 @@ class ServiceExecution:
                 print(self.service_ids)
                 print()
                 print()
+                reg_service = {}
                 if self.agent.node_info["role"] != "agent":
                     reg_service = self.agent.topology_manager.get_service(service["service_id"])
-                    self.fill_service(service, reg_service)
+                self.fill_service(service, reg_service)
                 if 'dependencies' in service.keys() and self.can_execute_service(service, self.agent.node_info) and "dependencies_done" not in service.keys():
                     print("Tiene dependencias")
                     Thread(target=self.attend_service_dependencies, args=(service, )).start()

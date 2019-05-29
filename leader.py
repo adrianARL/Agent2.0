@@ -71,6 +71,8 @@ class Leader(Agent):
                             self.agents_alive.pop(agent_id)
                             self.topology_manager.update({'nodeID': agent_id, 'status': 0})
                             print("He hecho update de {} a status 0".format(agent_id))
+                except:
+                    pass
 
     def receive_messages(self):
         th_messages = Thread(target=self.th_receive_messages)
