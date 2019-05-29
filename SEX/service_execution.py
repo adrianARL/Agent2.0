@@ -25,7 +25,7 @@ class ServiceExecution:
                 print(self.service_ids)
                 print()
                 print()
-                if self.agent.node_info["role"] != "agent" and not self.can_execute_service(service, self.agent.node_info):
+                if self.agent.node_info["role"] != "agent":
                     reg_service = self.agent.topology_manager.get_service(service["service_id"])
                     self.fill_service(service, reg_service)
                 if 'dependencies' in service.keys() and self.can_execute_service(service, self.agent.node_info) and "dependencies_done" not in service.keys():
@@ -108,24 +108,43 @@ class ServiceExecution:
         while True:
             if len(self.agent.services_results) > 0:
                 service_result = self.agent.services_results.pop(0)
-                if service_result["id"] in self.agent.generated_services_id:
-                    self.agent.my_services_results.append(service_result)
-                    print(self.agent.generated_services_id)
-                    origin = self.service_ids.get(service_result["id"])
-                    if origin and origin["origin_id"] in self.agent.generated_services_id :
+                origin = self.service_ids.get(service_result["id"])
+                if origin:
+                    if service_result["id"] in self.agent.generated_services_id:
+                        self.agent.generated_services_id.remove(service_result["id"])
+                    if origin["origin_id"] in self.agent.generated_services_id:
                         self.agent.generated_services_id.remove(origin["origin_id"])
-                    self.agent.generated_services_id.remove(service_result["id"])
-                    print("He removido ", service_result["id"])
-                    print(self.agent.generated_services_id)
-                else:
-                    if self.agent.node_info["role"] != "agent":
-                        id = service_result["id"]
-                        agent_id = self.service_ids[id]["agent_id"]
-                        service_result["id"] = self.service_ids[id]["origin_id"]
-                        print("Respondo: ", service_result)
-                        self.agent.send_dict_to(service_result, agent_id)
+                    service_result["id"] = origin["origin_id"]
+                    if origin["agent_id"] != self.agent.node_info["nodeID"]:
+                        if self.agent.node_info["role"] != "agent":
+                            agent_id = origin["agent_id"]
+                            print("Respondo: ", service_result)
+                            self.agent.send_dict_to(service_result, agent_id)
+                        else:
+                            self.agent.send_dict(service_result)
                     else:
-                        self.agent.send_dict(service_result)
+                        self.agent.my_services_results.append(service_result)
+
+
+
+                # if service_result["id"] in self.agent.generated_services_id:
+                #     self.agent.my_services_results.append(service_result)
+                #     print(self.agent.generated_services_id)
+                #     origin = self.service_ids.get(service_result["id"])
+                #     if origin and origin["origin_id"] in self.agent.generated_services_id :
+                #         self.agent.generated_services_id.remove(origin["origin_id"])
+                #     self.agent.generated_services_id.remove(service_result["id"])
+                #     print("He removido ", service_result["id"])
+                #     print(self.agent.generated_services_id)
+                # else:
+                #     if self.agent.node_info["role"] != "agent":
+                #         id = service_result["id"]
+                #         agent_id = self.service_ids[id]["agent_id"]
+                #         service_result["id"] = self.service_ids[id]["origin_id"]
+                #         print("Respondo: ", service_result)
+                #         self.agent.send_dict_to(service_result, agent_id)
+                #     else:
+                #         self.agent.send_dict(service_result)
 
 
     def fill_service(self, service, reg_service):
