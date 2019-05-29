@@ -18,13 +18,13 @@ class ServiceExecution:
     def wait_services(self):
         while True:
             if len(self.agent.services) > 0:
-                print("Ento en services")
+                # print("Ento en services")
                 service = self.agent.services.pop(0)
-                print(service)
-                print()
-                print(self.service_ids)
-                print()
-                print()
+                # print(service)
+                # print()
+                # print(self.service_ids)
+                # print()
+                # print()
                 reg_service = {}
                 if self.agent.node_info["role"] != "agent":
                     reg_service = self.agent.topology_manager.get_service(service["service_id"])
@@ -35,11 +35,11 @@ class ServiceExecution:
                 else:
                     print("No tiene dependencias")
                     if self.can_execute_service(service, self.agent.node_info):
-                        print("Puedo ejecutar {}".format(service.items()))
+                        print("Puedo ejecutar {}".format(service.get("service_id")))
                         result = self.agent.runtime.execute_service(service)
                         self.agent.services_results.append(result)
                     elif(self.agent.node_info["role"] != "agent"):
-                        print("Delego el servicio a un agent {}".format(service.items()))
+                        print("Delego el servicio a un agent {}".format(service.get("service_id")))
                         th_attend_service = Thread(target=self.attend_service, args=(service, ))
                         th_attend_service.start()
                         self.th_attend_services.append(th_attend_service)
@@ -96,10 +96,10 @@ class ServiceExecution:
 
 
     def can_execute_service(self, service, node_info):
-        print()
-        print(service.get("IoT"))
-        print(node_info.get("IoT"))
-        print()
+        # print()
+        # print(service.get("IoT"))
+        # print(node_info.get("IoT"))
+        # print()
         try:
             return set(service["IoT"]).issubset(set(node_info["IoT"]))
         except:
@@ -119,11 +119,13 @@ class ServiceExecution:
                     if origin["agent_id"] != self.agent.node_info["nodeID"]:
                         if self.agent.node_info["role"] != "agent":
                             agent_id = origin["agent_id"]
-                            print("Respondo: ", service_result)
+                            print("Devuelvo el resultado {} al agent {} ".format(service_result.get("output"), agent_id))
                             self.agent.send_dict_to(service_result, agent_id)
                         else:
+                            print("Devuelvo el resultado {} al leader".format(service_result.get("output")))
                             self.agent.send_dict(service_result)
                     else:
+                        print("Me quedo con el resultado {}".format(service_result.get("output")))
                         self.agent.my_services_results.append(service_result)
 
 

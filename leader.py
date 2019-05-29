@@ -105,17 +105,17 @@ class Leader(Agent):
 
     def process_dict(self, dict, agent_id):
         if dict["type"] == "register":
-            print("Entro en register")
+            # print("Entro en register")
             new_id = dict["id"]
             self.agents[new_id] = self.agents[agent_id]
             del self.agents[agent_id]
             self.topology_manager.update({'nodeID': new_id, 'zone': self.node_info['zone']})
-            print("He hecho update")
+            # print("He hecho update")
         elif dict["type"] == "service":
-            print("He recibido el servicio {}".format(dict.items()))
+            # print("He recibido el servicio {}".format(dict.items()))
             self.services.append(dict)
         elif dict["type"] == "service_result":
-            print("Resultado: ", dict.items())
+            print("Resultado: ", dict.get("output"))
             self.services_results.append(dict)
 
     def send_dict_to(self, dict, agent_id):

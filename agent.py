@@ -96,7 +96,7 @@ class Agent:
         self.socket_leader.send(message.encode())
 
     def send_dict(self, dict):
-        print("Envio al leader {}".format(dict.items()))
+        # print("Envio al leader {}".format(dict.items()))
         self.socket_leader.send(pickle.dumps(dict))
 
     def close_leader(self):
@@ -114,10 +114,9 @@ class Agent:
     def process_received_dict(self, dict):
         if dict["type"] == "service":
             self.services.append(dict)
-            print("He recibido service {}".format(dict.items()))
+            # print("He recibido service {}".format(dict.items()))
         elif dict["type"] == "service_result":
-            print("He recibido resultado de servicio")
-            print(dict.items())
+            print("He recibido resultado {} del servicio".format(dict.get("output")))
             pass
 
 ######################## SOCKET OPERATIONS ########################
