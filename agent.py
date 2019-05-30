@@ -5,6 +5,7 @@ from threading import Thread
 from TRM.topology_manager import TopologyManager
 from SEX.service_execution import ServiceExecution
 from RT.runtime import RunTime
+from API.api import API
 
 
 class Agent:
@@ -18,12 +19,14 @@ class Agent:
         self.topology_manager = TopologyManager(self.node_info["ipDB"], self.node_info["portDB"])
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
-        self.register_to_DB()
-        self.socket_leader =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket_alive =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        if(self.node_info['role'] == "agent"):
-            self.register_to_leader(self.node_info['leaderIP'], self.node_info['port'])
-            self.receive_messages()
+        self.API = API(self)
+        self.API.start()
+        # self.register_to_DB()
+        # self.socket_leader =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # self.socket_alive =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # if(self.node_info['role'] == "agent"):
+        #     self.register_to_leader(self.node_info['leaderIP'], self.node_info['port'])
+        #     self.receive_messages()
 
 
     def __del__(self):
@@ -145,3 +148,6 @@ class Agent:
         return random_id
 
 ############################## UTILS ##############################
+
+    def desde_API(self, datos):
+        print(datos)
