@@ -116,6 +116,7 @@ class Agent:
             self.services.append(dict)
             # print("He recibido service {}".format(dict.items()))
         elif dict["type"] == "service_result":
+            # TODO IF PARA LOS DIFERENTES ESTADOS (UNATTENDEDED...)
             print("He recibido resultado {} del servicio".format(dict.get("output")))
             pass
 
