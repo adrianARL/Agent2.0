@@ -148,6 +148,3 @@ class Agent:
         return random_id
 
 ############################## UTILS ##############################
-
-    def desde_API(self, datos):
-        print(datos)
