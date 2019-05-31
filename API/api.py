@@ -86,7 +86,7 @@ class API:
             input = cherrypy.request.json
         if input:
             selec = {"_id": input["service_id"]}
-            service = self.service_catalog.find(selec);
+            service = self.service_catalog.find_one(selec);
             return service
         else:
             return None
