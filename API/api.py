@@ -1,5 +1,6 @@
 import cherrypy
 import pymongo
+import requests
 
 
 @cherrypy.expose
@@ -12,6 +13,7 @@ class API:
         self.agent = agent
         self.host = host
         self.port = port
+        self.leader_url = "http://{}:8000".format(self.agent.node_info['leaderIP'])
         client = pymongo.MongoClient(self.IP_DB, self.PORT_DB)
         self.agent_collection = client.topoDB.nodes
         self.service_catalog = client.topoDB.service_catalog
@@ -67,8 +69,6 @@ class API:
             selec = cherrypy.request.json
             self.agent_collection.delete_one(selec)
 
-
-
     @cherrypy.expose
     @cherrypy.tools.json_in()
     # Update agent info to topoDB
@@ -112,4 +112,20 @@ class API:
     def register_to_leader(self):
         if cherrypy.request.method == "POST":
             agent_info = cherrypy.request.json
-            return agent_info
+            registered = requests.posts(self.leader_url + "/register_agent", json=self.agent.node_info)
+            if registered.status_code == 200:
+                print("Se ha registrado el agent correctamente")
+            else:
+                print("No se ha podido registrar el agent")
+
+    @cherrypy.expose
+    @cherrypy.tools.json_in()
+    def register_agent(self):
+        if cherrypy.request.method == "POST":
+            agent_info = cherrypy.request.json
+            registered = requests.posts(self.leader_url + "/register_agent", json=self.agent.node_info)
+            if registered.status_code == 200:
+                print("Se ha registrado el agent correctamente")
+                self.agent.node_info["nodeID"] = registered.text.zfill(10)
+            else:
+                print("No se ha podido registrar el agent")
