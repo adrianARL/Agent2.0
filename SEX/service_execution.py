@@ -137,7 +137,7 @@ class ServiceExecution:
 
 
     def fill_service(self, service, reg_service):
-        random_id = self.agent.generate_service_id()
+        random_id = str(self.agent.generate_service_id())
         service["origin_id"] = service["id"]
         service["id"] = random_id
         self.service_ids[random_id] = {
