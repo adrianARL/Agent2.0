@@ -33,7 +33,7 @@ class ServiceExecution:
                 print("Delego el servicio a un agent {}".format(service.get("service_id")))
                 self.attend_service(service)
             else:
-                self.agent.API.request_service_to_leader(service)
+                self.agent.API.delegate_service(service, self.agent.node_info["leaderIP"])
 
 
 
@@ -70,7 +70,7 @@ class ServiceExecution:
         if(agents):
             for agent in agents:
                 if(self.can_execute_service(service, agent)):
-                    self.agent.send_dict_to(service, agent["nodeID"])
+                    self.agent.API.delegate_service(service, agent["myIP"])
                     attended = True
                     break
         if not attended:
