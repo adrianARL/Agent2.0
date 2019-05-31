@@ -96,9 +96,10 @@ class API:
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
-    def execute_service(self):
+    def execute_service(self, service=None):
         if cherrypy.request.method == "POST":
             service = cherrypy.request.json
+        if service:
             self.agent.RT.execute_service(service)
 
     @cherrypy.expose
@@ -119,6 +120,17 @@ class API:
             print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
         else:
             print("No se ha podido registrar el agent")
+
+    def request_service_to_leader(self, service):
+        try:
+            status_code = requests.post(self.leader_url + "/request_service", json=service).status_code
+        except:
+            status_code = -1
+        if status_code != 200:
+            print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
+
+
+
 
     def register_cloud_agent(self):
         body = self.agent.node_info

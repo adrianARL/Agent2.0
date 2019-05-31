@@ -19,7 +19,5 @@ node_id = {
 	"zone": "A"
 }
 
-try:
-	leader = Agent(node_id)
-except KeyboardInterrupt:
-	del leader
+
+leader = Agent(node_id)
