@@ -77,7 +77,7 @@ class ServiceExecution:
                 "id": service["id"],
                 "status": "unattended",
                 "output": ""
-            }reques
+            }
             self.agent.services_results.append(result)
 
 
@@ -98,7 +98,7 @@ class ServiceExecution:
             if len(self.agent.services_results) > 0:
                 service_result = self.agent.services_results.pop(0)
                 origin = self.service_ids.get(service_result["id"])
-                if origin:reques
+                if origin:
                     if service_result["id"] in self.agent.generated_services_id:
                         self.agent.generated_services_id.remove(service_result["id"])
                     if origin["origin_id"] in self.agent.generated_services_id:
