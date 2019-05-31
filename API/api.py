@@ -92,7 +92,7 @@ class API:
     def request_service(self):
         if cherrypy.request.method == "POST":
             service = cherrypy.request.json
-            self.agent.SEX.request_service(service)
+            self.agent.service_execution.request_service(service)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -100,14 +100,14 @@ class API:
         if cherrypy.request.method == "POST":
             service = cherrypy.request.json
         if service:
-            self.agent.RT.execute_service(service)
+            self.agent.runtime.execute_service(service)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
     def response_service(self):
         if cherrypy.request.method == "POST":
             service_result = cherrypy.request.json
-            self.agent.SEX.add_service_result(service_result)
+            self.agent.service_execution.add_service_result(service_result)
 
     def register_to_leader(self):
         try:
