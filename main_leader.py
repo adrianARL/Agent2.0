@@ -11,7 +11,7 @@ node_id = {
 	"myIP" : subprocess.getoutput("hostname -I | awk '{print $1}'"),
 	"leaderIP" : '10.10.176.123',
 	"port" : 5000,
-	"IoT" : ["-", "RFID"],
+	"IoT" : ["-", "semaforo"],
 	"broadcastIP" : subprocess.getoutput("ip a | grep inet | grep brd | awk '{print $4}'"),
 	"cpu" : psutil.cpu_percent(),
 	"ram" : psutil.virtual_memory()[2],
