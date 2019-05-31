@@ -64,7 +64,8 @@ class ServiceExecution:
 
 
     def attend_service(self, service):
-        agents = self.agent.topology_manager.get_my_agents(self.agent.node_info["leaderID"])
+        agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
+        print(agents)
         attended = False
         if(agents):
             for agent in agents:
@@ -146,7 +147,7 @@ class ServiceExecution:
         service["id"] = random_id
 
         if "ip" in service.keys():
-            service["origin_ip"] = service["ip"] 
+            service["origin_ip"] = service["ip"]
         service["ip"] = self.agent.node_info["myIP"]
 
         # self.service_ids[random_id] = {
