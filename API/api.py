@@ -118,3 +118,14 @@ class API:
             print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
         else:
             print("No se ha podido registrar el agent")
+
+    def register_cloud_agent(self):
+        body = self.agent.node_info
+        try:
+            body['_id'] = 0
+            body["nodeID"] = "0".zfill(10)
+            self.agent_collection.insert_one(body)
+        except pymongo.errors.DuplicateKeyError as e:
+            pass
+        except Exception as e:
+            print(e)
