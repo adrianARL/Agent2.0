@@ -8,7 +8,7 @@ node_id = {
 	"portDB" : 8000,
 	"device" : "Leader A",
 	"role" : "leader",
-	"myIP" : subprocess.getoutput("hostname -I"),
+	"myIP" : subprocess.getoutput("hostname -I | awk '{print $1}'"),
 	"leaderIP" : '10.10.176.123',
 	"port" : 5000,
 	"IoT" : ["-", "RFID"],
