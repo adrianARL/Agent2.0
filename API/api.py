@@ -134,7 +134,8 @@ class API:
     def request_service_to_leader(self, service):
         try:
             status_code = requests.post(self.leader_url + "/request_service", json=service).status_code
-        except:
+        except Exception as e:
+            print(e)
             status_code = -1
         if status_code != 200:
             print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
