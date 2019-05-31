@@ -11,7 +11,6 @@ class ServiceExecution:
         self.th_wait_services = Thread(target=self.wait_services)
         self.th_attend_services = []
         self.service_ids = {}
-        Thread(target=self.wait_services).start()
         Thread(target=self.process_results).start()
 
 
