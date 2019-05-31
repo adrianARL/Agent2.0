@@ -143,7 +143,7 @@ class API:
 
     def send_result(self, result, agent_ip):
         try:
-            requests.post("http://"+agent_ip+"/response_service", json=result)
+            requests.post("http://"+agent_ip+":8000/response_service", json=result)
         except Exception as e:
             print(e)
 
