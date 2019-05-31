@@ -22,7 +22,6 @@ class Agent:
         self.API = API(self, host=self.node_info["myIP"])
         if self.node_info["role"] != "cloud_agent":
             self.API.register_to_leader()
-        print("Me he registrado")
         self.API.start()
         # self.register_to_DB()
         # self.socket_leader =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)

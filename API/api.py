@@ -15,8 +15,8 @@ class API:
         self.port = port
         self.leader_url = "http://{}:8000".format(self.agent.node_info['leaderIP'])
         client = pymongo.MongoClient(self.IP_DB, self.PORT_DB)
-        self.agent_collection = client.topoDB.nodes
-        self.service_catalog = client.topoDB.service_catalog
+        self.agent_collection = client.globalDB.nodes
+        self.service_catalog = client.globalDB.service_catalog
 
     def start(self, silent_access=False):
         cherrypy.server.socket_host = self.host
