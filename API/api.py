@@ -114,7 +114,7 @@ class API:
         except:
             status_code = -1
         if status_code == 200:
-            print("Se ha registrado el agent correctamente")
             self.agent.node_info["nodeID"] = registered.text.zfill(10)
+            print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
         else:
             print("No se ha podido registrar el agent")
