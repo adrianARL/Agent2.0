@@ -8,7 +8,6 @@ class ServiceExecution:
 
     def __init__(self, agent):
         self.agent = agent
-        self.th_wait_services = Thread(target=self.wait_services)
         self.th_attend_services = []
         self.service_ids = {}
         Thread(target=self.process_results).start()
