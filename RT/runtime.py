@@ -37,6 +37,8 @@ class RunTime:
                 "status": status,
                 "output": output
             }
+        if service["origin_ip"] != self.agent.node_info["myIP"] and self.agent.node_info["role"] != "agent":
+            self.agent.API.send_result(result, service["origin_ip"])
         if service["origin_ip"] != self.agent.node_info["myIP"]:
             self.agent.API.send_result(result, service["ip"])
         else:
