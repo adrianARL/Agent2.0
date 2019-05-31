@@ -37,7 +37,7 @@ class RunTime:
                 "status": status,
                 "output": output
             }
-        if "origin_ip" not in service.keys:
+        if "origin_ip" not in service.keys():
             print("El resultado {} es para mi".format(result))
         elif service["origin_ip"] != self.agent.node_info["myIP"] and self.agent.node_info["role"] != "agent":
             self.agent.API.send_result(result, service["origin_ip"])
