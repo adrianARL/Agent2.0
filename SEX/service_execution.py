@@ -144,10 +144,10 @@ class ServiceExecution:
         if "id" in service.keys():
             service["origin_id"] = service["id"]
         service["id"] = random_id
-        self.service_ids[random_id] = {
-            "origin_id": service["origin_id"],
-            "agent_id": service["agent_id"]
-        }
+        # self.service_ids[random_id] = {
+        #     "origin_id": service["origin_id"],
+        #     "agent_id": service["agent_id"]
+        # }
         self.agent.generated_services_id.append(random_id)
         for key in reg_service.keys():
             if not key in service.keys():
