@@ -45,21 +45,16 @@ class API:
     # Get all agents from topoDB
     @cherrypy.expose
     @cherrypy.tools.json_in()
-    def get_agents(self, **kwargs):
-        print(kwargs)
-        print(cherrypy.request.method)
+    def get_agents(self, selec=None):
         if cherrypy.request.method == "GET":
             selec = cherrypy.request.json
-            try:
-                agent_list=[]
-                print("Entro al try")
-                print(selec)
-                for agent_mongo in self.agent_collection.find(selec):
-                    agent_list.append(agent_mongo)
-                return agent_list
-            except:
-                print("Entro except!!!!")
-                print(selec)
+        try:
+            agent_list=[]
+            for agent_mongo in self.agent_collection.find(selec):
+                agent_list.append(agent_mongo)
+            return agent_list
+        except Exception as e:
+            print(e)
 
 
     @cherrypy.expose
