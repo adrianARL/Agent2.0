@@ -63,7 +63,7 @@ class ServiceExecution:
 
     def attend_service(self, service):
         agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
-        print(agents)reques
+        print(agents)
         attended = False
         if(agents):
             for agent in agents:
