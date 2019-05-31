@@ -111,7 +111,8 @@ class API:
     def response_service(self):
         if cherrypy.request.method == "POST":
             service_result = cherrypy.request.json
-            self.agent.service_execution.add_service_result(service_result)
+            print(service_result)
+            # self.agent.service_execution.add_service_result(service_result)
 
     def register_to_leader(self):
         try:
@@ -140,6 +141,11 @@ class API:
         if status_code != 200:
             print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
 
+    def send_result(self, result, agent_ip):
+        try:
+            requests.post("http://"+agent_ip+"/response_service", json=result)
+        except Exception as e:
+            print(e)
 
 
 
