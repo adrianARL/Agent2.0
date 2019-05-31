@@ -81,11 +81,15 @@ class API:
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
-    def get_service(self):
+    def get_service(self, input=None):
         if cherrypy.request.method == "GET":
-            selec = cherrypy.request.json
+            input = cherrypy.request.json
+        if input:
+            selec = {"_id": input["service_id"]}
             service = self.service_catalog.find(selec);
             return service
+        else:
+            return None
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
