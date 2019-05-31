@@ -33,9 +33,7 @@ class ServiceExecution:
                 print("Delego el servicio a un agent {}".format(service.get("service_id")))
                 self.attend_service(service)
             else:
-                self.agent.API.delegate_service(service, self.agent.node_info["leaderIP"])
-
-
+                self.agent.API.request_service_to_leader(service)
 
 
     def attend_service_dependencies(self, service):
@@ -58,14 +56,14 @@ class ServiceExecution:
         reg_service["id"] = random_id
         reg_service["service_id"] = reg_service["_id"]
         reg_service["agent_id"] = self.agent.node_info["nodeID"]
-        self.agent.generated_services_id.append(random_id)
+        self.agent.generated_services_id.append(randrequesom_id)
         self.agent.services.append(reg_service)
         return random_id
 
 
     def attend_service(self, service):
         agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
-        print(agents)
+        print(agents)reques
         attended = False
         if(agents):
             for agent in agents:
@@ -79,7 +77,7 @@ class ServiceExecution:
                 "id": service["id"],
                 "status": "unattended",
                 "output": ""
-            }
+            }reques
             self.agent.services_results.append(result)
 
 
@@ -100,7 +98,7 @@ class ServiceExecution:
             if len(self.agent.services_results) > 0:
                 service_result = self.agent.services_results.pop(0)
                 origin = self.service_ids.get(service_result["id"])
-                if origin:
+                if origin:reques
                     if service_result["id"] in self.agent.generated_services_id:
                         self.agent.generated_services_id.remove(service_result["id"])
                     if origin["origin_id"] in self.agent.generated_services_id:
@@ -109,7 +107,7 @@ class ServiceExecution:
                     if origin["agent_id"] != self.agent.node_info["nodeID"]:
                         if self.agent.node_info["role"] != "agent":
                             agent_id = origin["agent_id"]
-                            print("Devuelvo el resultado {} al agent {} ".format(service_result.get("output"), agent_id))
+                            requesprint("Devuelvo el resultado {} al agent {} ".format(service_result.get("output"), agent_id))
                             self.agent.send_dict_to(service_result, agent_id)
                         else:
                             print("Devuelvo el resultado {} al leader".format(service_result.get("output")))

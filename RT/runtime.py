@@ -37,7 +37,10 @@ class RunTime:
                 "status": status,
                 "output": output
             }
-        self.agent.API.send_result(result, service["origin_ip"])
+        if service["origin_ip"] != self.agent.node_info["myIP"]:
+            self.agent.API.send_result(result, service["ip"])
+        else:
+            print("El resultado {} es para mi".format(result))
 
     def execute_code(self, code, params):
         if params:
