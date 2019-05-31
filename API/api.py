@@ -107,25 +107,9 @@ class API:
             service_result = cherrypy.request.json
             self.agent.SEX.add_service_result(service_result)
 
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
     def register_to_leader(self):
-        if cherrypy.request.method == "POST":
-            agent_info = cherrypy.request.json
-            registered = requests.posts(self.leader_url + "/register_agent", json=self.agent.node_info)
-            if registered.status_code == 200:
-                print("Se ha registrado el agent correctamente")
-            else:
-                print("No se ha podido registrar el agent")
-
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
-    def register_agent(self):
-        if cherrypy.request.method == "POST":
-            agent_info = cherrypy.request.json
-            registered = requests.posts(self.leader_url + "/register_agent", json=self.agent.node_info)
-            if registered.status_code == 200:
-                print("Se ha registrado el agent correctamente")
-                self.agent.node_info["nodeID"] = registered.text.zfill(10)
-            else:
-                print("No se ha podido registrar el agent")
+        registered = requests.posts(self.leader_url + "/register_agent", json=self.agent.node_info)
+        if registered.status_code == 200:
+            print("Se ha registrado el agent correctamente")
+        else:
+            print("No se ha podido registrar el agent")
