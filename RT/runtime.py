@@ -37,7 +37,7 @@ class RunTime:
                 "status": status,
                 "output": output
             }
-        self.agent.API.send_result(result, service["origin_IP"])
+        self.agent.API.send_result(result, service["origin_ip"])
 
     def execute_code(self, code, params):
         if params:
