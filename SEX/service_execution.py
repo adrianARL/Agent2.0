@@ -13,7 +13,7 @@ class ServiceExecution:
         Thread(target=self.process_results).start()
 
 
-    def request_servicel(self, service):
+    def request_service(self, service):
         reg_service = {}
         if self.agent.node_info["role"] != "agent":
             reg_service = self.agent.topology_manager.get_service(service["service_id"])
