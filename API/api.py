@@ -36,6 +36,7 @@ class API:
             try:
                 nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
                 body['_id'] = str(int(nodeID))
+                body['leaderID'] = self.agent.node_info["nodeID"]
                 self.agent_collection.insert_one(body)
             except pymongo.errors.DuplicateKeyError as e:
                 nodeID = post_topoDB(body)

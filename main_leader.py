@@ -9,7 +9,7 @@ node_id = {
 	"device" : "Leader A",
 	"role" : "leader",
 	"myIP" : subprocess.getoutput("hostname -I"),
-	"leaderIP" : '10.2.3.5',
+	"leaderIP" : '10.10.176.123',
 	"port" : 5000,
 	"IoT" : ["-", "-"],
 	"broadcastIP" : subprocess.getoutput("ip a | grep inet | grep brd | awk '{print $4}'"),
