@@ -19,10 +19,11 @@ class Agent:
         self.topology_manager = TopologyManager(self.node_info["ipDB"], self.node_info["portDB"])
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
-        self.API = API(self, host=self.node_info['myIP'])
-        self.API.start()
+        self.API = API(self, host=self.node_info["myIP"])
         if self.node_info["role"] != "cloud_agent":
             self.API.register_to_leader()
+        print("Me he registrado")
+        self.API.start()
         # self.register_to_DB()
         # self.socket_leader =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # self.socket_alive =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)

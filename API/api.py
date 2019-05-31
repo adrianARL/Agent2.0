@@ -108,8 +108,12 @@ class API:
             self.agent.SEX.add_service_result(service_result)
 
     def register_to_leader(self):
-        registered = requests.posts(self.leader_url + "/register_agent", json=self.agent.node_info)
+        try:
+            registered = requests.post(self.leader_url + "/register_agent", json=self.agent.node_info)
+        except:
+            registered.status_code = -1
         if registered.status_code == 200:
             print("Se ha registrado el agent correctamente")
+            self.agent.node_info["nodeID"] = registered.text.zfill(10)
         else:
             print("No se ha podido registrar el agent")
