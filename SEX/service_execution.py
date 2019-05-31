@@ -144,7 +144,7 @@ class ServiceExecution:
         if "id" in service.keys():
             service["origin_id"] = service["id"]
         service["id"] = random_id
-        service_id["origin_IP"] = self.node_info["myIP"]
+        service_id["origin_IP"] = self.agent.node_info["myIP"]
         # self.service_ids[random_id] = {
         #     "origin_id": service["origin_id"],
         #     "agent_id": service["agent_id"]
