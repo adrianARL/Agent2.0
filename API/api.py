@@ -7,6 +7,7 @@ import requests
 class API:
 
     IP_DB = '10.0.2.16'
+    # IP_DB = '127.0.0.1'
     PORT_DB = 27017
 
     def __init__(self, agent, host='localhost', port=8000):
@@ -36,6 +37,7 @@ class API:
             try:
                 nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
                 body['_id'] = str(int(nodeID))
+                body['nodeID'] = str(int(nodeID))
                 body['leaderID'] = self.agent.node_info["nodeID"]
                 self.agent_collection.insert_one(body)
             except pymongo.errors.DuplicateKeyError as e:
@@ -119,6 +121,7 @@ class API:
             if self.agent.node_info["role"] != "agent":
                 nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
                 self.agent.node_info['_id'] = str(int(nodeID))
+                self.agent.node_info['nodeID'] = str(int(nodeID))
                 self.agent_collection.insert_one(self.agent.node_info)
                 status_code = 200
         if status_code == 200:
