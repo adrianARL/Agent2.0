@@ -19,6 +19,17 @@ class API:
         self.agent_collection = client.globalDB.nodes
         self.service_catalog = client.globalDB.service_catalog
 
+    def OPTIONS(self, key=None, word=None):
+        cherrypy.response.headers['Access-Control-Allow-Headers'] = 'Access-Control-Allow-Origin, Content-Type'
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
+
+        possible_methods = ('PUT', 'DELETE', 'PATCH', 'POST')
+        methods = [http_method for http_method in possible_methods
+                   if hasattr(self, http_method)]
+        cherrypy.response.headers['Access-Control-Allow-Methods'] = ','.join(
+            methods
+        )
+
     def start(self, silent_access=False):
         cherrypy.server.socket_host = self.host
         cherrypy.server.socket_port = self.port
