@@ -4,7 +4,7 @@ import requests
 
 
 @cherrypy.expose
-class API:
+class API(object):
 
     IP_DB = '10.0.2.16'
     # IP_DB = '127.0.0.1'
@@ -19,20 +19,82 @@ class API:
         self.agent_collection = client.globalDB.nodes
         self.service_catalog = client.globalDB.service_catalog
 
+<<<<<<< HEAD
+=======
+    def GET(self, obj=None, id=None):
+        if obj == "agent":
+            if id:
+                # devolver info del agent
+                pass
+            else:
+                #devolver info de todos los agent
+                pass
+        elif obj == "service":
+            if id:
+                # devolver info del service
+                pass
+            else:
+                #devolver info de todos los services
+                pass
+
+    @cherrypy.tools.json_in()
+    def POST(self, action=None):
+        print(action, cherrypy.request.json)
+        if action == "register_agent":
+            pass
+        elif action == "request_service":
+            pass
+        elif action == "execute_service":
+            pass
+        elif action == "response_service":
+            pass
+
+    @cherrypy.tools.json_in()
+    def PUT(self, action=None):
+        if action == "update_agent":
+            pass
+
+    def DELETE(self, action=None):
+        if action == "delete_agent":
+            pass
+
+    def OPTIONS(self):
+        print("opcioneeeeees")
+        cherrypy.response.headers['Access-Control-Allow-Headers'] = 'Access-Control-Allow-Origin, Content-Type'
+        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
+        cherrypy.response.headers['Content-Type'] = '*'
+        possible_methods = ('PUT', 'DELETE', 'PATCH', 'POST')
+        methods = [http_method for http_method in possible_methods
+                   if hasattr(self, http_method)]
+        cherrypy.response.headers['Access-Control-Allow-Methods'] = ','.join(methods)
+>>>>>>> 732b2f5a6c2d3ef8481e2cb18eae2c8fbb1d6bfe
 
     def start(self, silent_access=False):
+        conf = {
+            '/': {
+                'request.dispatch': cherrypy.dispatch.MethodDispatcher(),
+                'tools.sessions.on': True,
+                'tools.response_headers.on': True,
+                'tools.response_headers.headers': [
+                    ('Access-Control-Allow-Origin', '*'),
+                    ('Content-Type', '*')
+                ]
+            }
+        }
+        cherrypy.config.update({'log.screen': not silent_access})
         cherrypy.server.socket_host = self.host
         cherrypy.server.socket_port = self.port
+<<<<<<< HEAD
         cherrypy.config.update({'log.screen': not silent_access})
         # cherrypy.quickstart(API(self.agent))
         cherrypy.quickstart(API(self.agent), '/')
+=======
+        cherrypy.quickstart(API(self.agent), '/', conf)
+>>>>>>> 732b2f5a6c2d3ef8481e2cb18eae2c8fbb1d6bfe
 
     def stop(self):
         cherrypy.engine.exit()
 
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
-    # Register agent a la topoDB
     def register_agent(self):
         if cherrypy.request.method == "POST":
             body = cherrypy.request.json
@@ -46,9 +108,6 @@ class API:
                 nodeID = post_topoDB(body)
             return str(int(nodeID))
 
-    # Get all agents from topoDB
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
     def get_agents(self, selec=None):
         if cherrypy.request.method == "GET":
             selec = cherrypy.request.json
@@ -60,26 +119,17 @@ class API:
         except Exception as e:
             print(e)
 
-
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
-    # Delete agent from topoDB
     def delete_agent(self):
         if cherrypy.request.method == "DELETE":
             selec = cherrypy.request.json
             self.agent_collection.delete_one(selec)
 
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
-    # Update agent info to topoDB
     def update_agent(self):
         if cherrypy.request.method == "PUT":
             body = cherrypy.request.json
             id = body['nodeID'].strip("0")
             self.agent_collection.update({'_id': id},{"$set":body},True)
 
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
     def get_service(self, input=None):
         if cherrypy.request.method == "GET":
             input = cherrypy.request.json
@@ -90,8 +140,6 @@ class API:
         else:
             return None
 
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
     def request_service(self):
         if cherrypy.request.method == "POST":
             service = cherrypy.request.json
@@ -99,16 +147,12 @@ class API:
         elif cherrypy.request.method == "OPTIONS":
             print(cherrypy.request.params)
 
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
     def execute_service(self, service=None):
         if cherrypy.request.method == "POST":
             service = cherrypy.request.json
         if service:
             self.agent.runtime.execute_service(service)
 
-    @cherrypy.expose
-    @cherrypy.tools.json_in()
     def response_service(self):
         if cherrypy.request.method == "POST":
             service_result = cherrypy.request.json
