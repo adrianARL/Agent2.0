@@ -25,6 +25,8 @@ class API(object):
             self.get_agents(id)
         elif obj == "service":
             self.get_service(id)
+        elif obj == "alive":
+            return "Alive".encode()
 
     @cherrypy.tools.json_in()
     def POST(self, action=None):
@@ -90,6 +92,7 @@ class API(object):
             body['nodeID'] = str(int(nodeID)).zfill(10)
             body['leaderID'] = self.agent.node_info["nodeID"]
             self.agent_collection.insert_one(body)
+            self.agent.agents_alive[body["myIP"]] = 1
         except pymongo.errors.DuplicateKeyError as e:
             nodeID = self.register_agent(body)
         print(str(int(nodeID)))
@@ -114,8 +117,12 @@ class API(object):
         self.agent_collection.delete_one(selec)
 
     def update_agent(self, body):
-        id = body['nodeID'].strip("0")
-        self.agent_collection.update({'_id': id},{"$set":body},True)
+        if "nodeID" in body.keys():
+            id = body['nodeID'].strip("0")
+            self.agent_collection.update({'_id': id},{"$set":body},True)
+        else:
+            ip = body["myIP"]
+            self.agent_collection.update({'myIP': ip},{"$set":body},True)
 
     def get_service(self, input=None):
         if input:
@@ -134,7 +141,7 @@ class API(object):
         self.agent.runtime.execute_service(service)
 
     def response_service(self, service_result):
-        print(service_result)
+        pass
         # self.agent.service_execution.add_service_result(service_result)
 
     def register_to_leader(self):
@@ -202,3 +209,10 @@ class API(object):
         elif data is not None:
             result = data
         return result.encode()
+
+    def check_alive(self, agent_ip):
+        try:
+            request.get("http://"+agent_ip+":8000/alive")
+            self.agent.TRM.change_agent_status(agent_ip, 1)
+        except:
+            self.agent.TRM.change_agent_status(agent_ip, 0)

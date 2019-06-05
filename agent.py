@@ -12,12 +12,13 @@ from API.api import API
 class Agent:
 
     def __init__(self, node_info):
+        self.agents_alive = {}
         self.node_info = node_info
         self.services = [] # list of services ids {'id': service_id}
         self.generated_services_id = []
         self.services_results = []
         self.my_services_results = []
-        self.topology_manager = TopologyManager(self.node_info["ipDB"], self.node_info["portDB"])
+        self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
         self.API = API(self, host=self.node_info["myIP"])
