@@ -2,7 +2,6 @@ import cherrypy
 import pymongo
 import requests
 import pickle
-import simplejson
 
 
 @cherrypy.expose
@@ -29,12 +28,6 @@ class API(object):
 
     @cherrypy.tools.json_in()
     def POST(self, action=None):
-        # print("Entro en post")
-        # cl = cherrypy.request.headers['Content-Length']
-        # rawbody = cherrypy.request.body.read(int(cl))
-        # print(rawbody)
-        # body = simplejson.loads(rawbody)
-        # print(body)
         info = cherrypy.request.json
         print(info)
         result = ""
@@ -65,7 +58,7 @@ class API(object):
         cherrypy.response.headers['Access-Control-Allow-Headers'] = 'Access-Control-Allow-Origin, Content-Type'
         cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         cherrypy.response.headers['Content-Type'] = '*'
-        possible_methods = ('PUT', 'DELETE', 'PATCH')
+        possible_methods = ('PUT', 'DELETE')
         methods = [http_method for http_method in possible_methods
                    if hasattr(self, http_method)]
         cherrypy.response.headers['Access-Control-Allow-Methods'] = ','.join(methods)
