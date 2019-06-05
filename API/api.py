@@ -19,22 +19,13 @@ class API:
         self.agent_collection = client.globalDB.nodes
         self.service_catalog = client.globalDB.service_catalog
 
-    def OPTIONS(self, key=None, word=None):
-        cherrypy.response.headers['Access-Control-Allow-Headers'] = 'Access-Control-Allow-Origin, Content-Type'
-        cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
-
-        possible_methods = ('PUT', 'DELETE', 'PATCH', 'POST')
-        methods = [http_method for http_method in possible_methods
-                   if hasattr(self, http_method)]
-        cherrypy.response.headers['Access-Control-Allow-Methods'] = ','.join(
-            methods
-        )
 
     def start(self, silent_access=False):
         cherrypy.server.socket_host = self.host
         cherrypy.server.socket_port = self.port
         cherrypy.config.update({'log.screen': not silent_access})
-        cherrypy.quickstart(API(self.agent))
+        # cherrypy.quickstart(API(self.agent))
+        cherrypy.quickstart(API(self.agent), '/')
 
     def stop(self):
         cherrypy.engine.exit()
@@ -48,7 +39,7 @@ class API:
             try:
                 nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
                 body['_id'] = str(int(nodeID))
-                body['nodeID'] = str(int(nodeID))
+                body['nodeID'] = str(int(nodeID)).rjust(10, '0')
                 body['leaderID'] = self.agent.node_info["nodeID"]
                 self.agent_collection.insert_one(body)
             except pymongo.errors.DuplicateKeyError as e:
@@ -105,6 +96,8 @@ class API:
         if cherrypy.request.method == "POST":
             service = cherrypy.request.json
             self.agent.service_execution.request_service(service)
+        elif cherrypy.request.method == "OPTIONS":
+            print(cherrypy.request.params)
 
     @cherrypy.expose
     @cherrypy.tools.json_in()
@@ -123,23 +116,24 @@ class API:
             # self.agent.service_execution.add_service_result(service_result)
 
     def register_to_leader(self):
-        try:
-            registered = requests.post(self.leader_url + "/register_agent", json=self.agent.node_info)
-            status_code = registered.status_code
-            nodeID = registered.text.zfill(10)
-        except:
-            status_code = -1
-            if self.agent.node_info["role"] != "agent":
-                nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
-                self.agent.node_info['_id'] = str(int(nodeID))
-                self.agent.node_info['nodeID'] = str(int(nodeID))
-                self.agent_collection.insert_one(self.agent.node_info)
-                status_code = 200
-        if status_code == 200:
-            self.agent.node_info["nodeID"] = nodeID
-            print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
-        else:
-            print("No se ha podido registrar el agent")
+        if 'nodeID' not in self.agent.node_info:
+            try:
+                registered = requests.post(self.leader_url + "/register_agent", json=self.agent.node_info)
+                status_code = registered.status_code
+                nodeID = registered.text.zfill(10)
+            except:
+                status_code = -1
+                if self.agent.node_info["role"] != "agent":
+                    nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
+                    self.agent.node_info['_id'] = str(int(nodeID))
+                    self.agent.node_info['nodeID'] = str(int(nodeID))
+                    self.agent_collection.insert_one(self.agent.node_info)
+                    status_code = 200
+            if status_code == 200:
+                self.agent.node_info["nodeID"] = nodeID
+                print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
+            else:
+                print("No se ha podido registrar el agent")
 
     def delegate_service(self, service, agent_ip):
         try:
@@ -164,8 +158,6 @@ class API:
             requests.post("http://"+agent_ip+":8000/response_service", json=result)
         except Exception as e:
             print(e)
-
-
 
     def register_cloud_agent(self):
         body = self.agent.node_info
