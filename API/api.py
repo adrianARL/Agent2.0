@@ -21,40 +21,32 @@ class API(object):
 
     def GET(self, obj=None, id=None):
         if obj == "agent":
-            if id:
-                # devolver info del agent
-                pass
-            else:
-                #devolver info de todos los agent
-                pass
+            self.get_agents(id)
         elif obj == "service":
-            if id:
-                # devolver info del service
-                pass
-            else:
-                #devolver info de todos los services
-                pass
+            self.get_service(id)
 
     @cherrypy.tools.json_in()
     def POST(self, action=None):
-        print(action, cherrypy.request.json)
+        info = cherrypy.request.json
         if action == "register_agent":
-            pass
+            self.register_agent(info)
         elif action == "request_service":
-            pass
+            self.request_service(info)
         elif action == "execute_service":
-            pass
+            self.execute_service(info)
         elif action == "response_service":
-            pass
+            self.response_service(info)
 
     @cherrypy.tools.json_in()
     def PUT(self, action=None):
+        info = cherrypy.request.json
         if action == "update_agent":
-            pass
+            self.update_agent(info)
 
     def DELETE(self, action=None):
+        info = cherrypy.request.json
         if action == "delete_agent":
-            pass
+            self.delete_agent(info)
 
     def OPTIONS(self):
         print("opcioneeeeees")
@@ -86,22 +78,24 @@ class API(object):
     def stop(self):
         cherrypy.engine.exit()
 
-    def register_agent(self):
-        if cherrypy.request.method == "POST":
-            body = cherrypy.request.json
-            try:
-                nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
-                body['_id'] = str(int(nodeID))
-                body['nodeID'] = str(int(nodeID))
-                body['leaderID'] = self.agent.node_info["nodeID"]
-                self.agent_collection.insert_one(body)
-            except pymongo.errors.DuplicateKeyError as e:
-                nodeID = post_topoDB(body)
-            return str(int(nodeID))
+    def register_agent(self, body):
+        try:
+            nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
+            body['_id'] = str(int(nodeID))
+            body['nodeID'] = str(int(nodeID))
+            body['leaderID'] = self.agent.node_info["nodeID"]
+            self.agent_collection.insert_one(body)
+        except pymongo.errors.DuplicateKeyError as e:
+            nodeID = post_topoDB(body)
+        return str(int(nodeID))
 
     def get_agents(self, selec=None):
-        if cherrypy.request.method == "GET":
-            selec = cherrypy.request.json
+        if selec:
+            # obtener un agent
+            pass
+        else:
+            #obtener todos los agents
+            pass
         try:
             agent_list=[]
             for agent_mongo in self.agent_collection.find(selec):
@@ -110,43 +104,32 @@ class API(object):
         except Exception as e:
             print(e)
 
-    def delete_agent(self):
-        if cherrypy.request.method == "DELETE":
-            selec = cherrypy.request.json
-            self.agent_collection.delete_one(selec)
+    def delete_agent(self, selec):
+        self.agent_collection.delete_one(selec)
 
-    def update_agent(self):
-        if cherrypy.request.method == "PUT":
-            body = cherrypy.request.json
-            id = body['nodeID'].strip("0")
-            self.agent_collection.update({'_id': id},{"$set":body},True)
+    def update_agent(self, body):
+        id = body['nodeID'].strip("0")
+        self.agent_collection.update({'_id': id},{"$set":body},True)
 
     def get_service(self, input=None):
-        if cherrypy.request.method == "GET":
-            input = cherrypy.request.json
         if input:
+            # obtener un servicio
             selec = {"_id": input["service_id"]}
             service = self.service_catalog.find_one(selec);
             return service
         else:
+            # obtener todos los servicios
             return None
 
-    def request_service(self):
-        if cherrypy.request.method == "POST":
-            service = cherrypy.request.json
-            self.agent.service_execution.request_service(service)
+    def request_service(self, service):
+        self.agent.service_execution.request_service(service)
 
-    def execute_service(self, service=None):
-        if cherrypy.request.method == "POST":
-            service = cherrypy.request.json
-        if service:
-            self.agent.runtime.execute_service(service)
+    def execute_service(self, service):
+        self.agent.runtime.execute_service(service)
 
-    def response_service(self):
-        if cherrypy.request.method == "POST":
-            service_result = cherrypy.request.json
-            print(service_result)
-            # self.agent.service_execution.add_service_result(service_result)
+    def response_service(self, service_result):
+        print(service_result)
+        # self.agent.service_execution.add_service_result(service_result)
 
     def register_to_leader(self):
         try:
