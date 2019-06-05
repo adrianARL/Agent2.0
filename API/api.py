@@ -132,23 +132,24 @@ class API(object):
         # self.agent.service_execution.add_service_result(service_result)
 
     def register_to_leader(self):
-        try:
-            registered = requests.post(self.leader_url + "/register_agent", json=self.agent.node_info)
-            status_code = registered.status_code
-            nodeID = registered.text.zfill(10)
-        except:
-            status_code = -1
-            if self.agent.node_info["role"] != "agent":
-                nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
-                self.agent.node_info['_id'] = str(int(nodeID))
-                self.agent.node_info['nodeID'] = str(int(nodeID))
-                self.agent_collection.insert_one(self.agent.node_info)
-                status_code = 200
-        if status_code == 200:
-            self.agent.node_info["nodeID"] = nodeID
-            print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
-        else:
-            print("No se ha podido registrar el agent")
+        if 'nodeID' not in self.agent.node_info:
+            try:
+                registered = requests.post(self.leader_url + "/register_agent", json=self.agent.node_info)
+                status_code = registered.status_code
+                nodeID = registered.text.zfill(10)
+            except:
+                status_code = -1
+                if self.agent.node_info["role"] != "agent":
+                    nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
+                    self.agent.node_info['_id'] = str(int(nodeID))
+                    self.agent.node_info['nodeID'] = str(int(nodeID))
+                    self.agent_collection.insert_one(self.agent.node_info)
+                    status_code = 200
+            if status_code == 200:
+                self.agent.node_info["nodeID"] = nodeID
+                print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
+            else:
+                print("No se ha podido registrar el agent")
 
     def delegate_service(self, service, agent_ip):
         try:

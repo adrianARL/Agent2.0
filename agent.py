@@ -1,6 +1,7 @@
 import socket
 import pickle
 import uuid
+from pathlib import Path
 from threading import Thread
 from TRM.topology_manager import TopologyManager
 from SEX.service_execution import ServiceExecution
@@ -20,6 +21,7 @@ class Agent:
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
         self.API = API(self, host=self.node_info["myIP"])
+        self.get_nodeID()
         if self.node_info["role"] != "cloud_agent":
             self.API.register_to_leader()
         else:
@@ -37,6 +39,18 @@ class Agent:
         print("termino")
         self.node_info["status"] = 0
         self.update_DB_info()
+
+
+    def get_nodeID(self):
+        config_file = Path("./config/agent.conf")
+        if config_file.is_file():
+            with open(config_file) as fp:
+                for line in fp:
+                    key = line.strip('=')[0]
+                    value = line.strip('=')[1]
+                    print(line)
+
+
 
 ######################### TRM OPERATIONS ##########################
 
