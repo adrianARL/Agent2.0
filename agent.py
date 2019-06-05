@@ -18,7 +18,6 @@ class Agent:
         self.generated_services_id = []
         self.services_results = []
         self.my_services_results = []
-        self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
         self.API = API(self, host=self.node_info["myIP"])
@@ -27,6 +26,7 @@ class Agent:
             self.API.register_to_leader()
         else:
             self.API.register_cloud_agent()
+        self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
         self.API.start()
 
 
