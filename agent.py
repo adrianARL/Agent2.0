@@ -21,18 +21,13 @@ class Agent:
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
         self.API = API(self, host=self.node_info["myIP"])
-        self.get_nodeID()
+        self.get_attributes()
         if self.node_info["role"] != "cloud_agent":
             self.API.register_to_leader()
         else:
             self.API.register_cloud_agent()
         self.API.start()
-        # self.register_to_DB()
-        # self.socket_leader =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self.socket_alive =  socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # if(self.node_info['role'] == "agent"):
-        #     self.register_to_leader(self.node_info['leaderIP'], self.node_info['port'])
-        #     self.receive_messages()
+
 
 
     def __del__(self):
@@ -41,14 +36,15 @@ class Agent:
         self.update_DB_info()
 
 
-    def get_nodeID(self):
+    def get_attributes(self):
         config_file = Path("./config/agent.conf")
         if config_file.is_file():
             with open(config_file) as fp:
                 for line in fp:
-                    key = line.strip('=')[0]
-                    value = line.strip('=')[1]
                     print(line)
+                    key = line.split('=')[0]
+                    value = line.split('=')[1].strip()
+                    self.node_info[key] = value
 
 
 
