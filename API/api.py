@@ -207,7 +207,7 @@ class API(object):
 
     def check_alive(self, agent_ip):
         try:
-            request.get("http://"+agent_ip+":8000/alive")
-            self.agent.TRM.change_agent_status(agent_ip, 1)
+            requests.get("http://"+agent_ip+":8000/alive")
+            self.agent.topology_manager.change_agent_status(agent_ip, 1)
         except:
-            self.agent.TRM.change_agent_status(agent_ip, 0)
+            self.agent.topology_manager.change_agent_status(agent_ip, 0)

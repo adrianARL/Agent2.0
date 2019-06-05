@@ -20,6 +20,7 @@ class Agent:
         self.my_services_results = []
         self.service_execution = ServiceExecution(self)
         self.runtime = RunTime(self)
+        self.topology_manager = None
         self.API = API(self, host=self.node_info["myIP"])
         self.get_attributes()
         if self.node_info["role"] != "cloud_agent":

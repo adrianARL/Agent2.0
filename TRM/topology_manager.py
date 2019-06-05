@@ -1,5 +1,6 @@
 import requests
 import json
+import time
 from threading import Thread
 
 
@@ -20,19 +21,23 @@ class TopologyManager:
 
     def get_my_agents(self):
         try:
-            PARAMS = "selec={'leaderID':'"+self.agent.node_info["nodeID"]+"'}"
+            PARAMS = {'leaderID' : self.agent.node_info["nodeID"]}
             agents = self.agent.API.get_agents(PARAMS)
             for agent in agents:
                 self.agent.agents_alive[agent["myIP"]] = agent["status"]
-        except:
+        except Exception as e:
+            print(e)
             pass
 
     def check_alive_agents(self):
         while True:
-            for agent in self.agent.agents_alive.keys():
-                if agent["nodeID"] != self.agent.node_info["nodeID"]:
-                    self.agent.API.check_alive(agent["myIP"])
+            for agent_ip in list(self.agent.agents_alive.keys()):
+                if agent_ip != self.agent.node_info["myIP"]:
+                    self.agent.API.check_alive(agent_ip)
+            time.sleep(2)
 
     def change_agent_status(self, agent_ip, status):
         if self.agent.agents_alive[agent_ip] != status:
+            print("Se ha actualizado el estado {} al agent con ip {}".format(status, agent_ip))
             self.agent.API.update_agent({'myIP': agent_ip, 'status': status})
+            self.agent.agents_alive[agent_ip] = status
