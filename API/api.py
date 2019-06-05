@@ -100,18 +100,13 @@ class API(object):
 
     def get_agents(self, selec=None):
         if selec:
-            # obtener un agent
-            pass
-        else:
-            #obtener todos los agents
-            pass
-        try:
-            agent_list=[]
-            for agent_mongo in self.agent_collection.find(selec):
-                agent_list.append(agent_mongo)
-            return agent_list
-        except Exception as e:
-            print(e)
+            try:
+                agent_list=[]
+                for agent_mongo in self.agent_collection.find(selec):
+                    agent_list.append(agent_mongo)
+                return agent_list
+            except Exception as e:
+                print(e)
 
     def delete_agent(self, selec):
         self.agent_collection.delete_one(selec)
