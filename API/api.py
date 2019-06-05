@@ -38,6 +38,7 @@ class API(object):
             result = self.execute_service(info)
         elif action == "response_service":
             result = self.response_service(info)
+        print("Result: ",result)
         return self.return_data(result)
 
     @cherrypy.tools.json_in()
@@ -197,4 +198,6 @@ class API(object):
             result = pickle.dumps(dict)
         elif isinstance(data, int):
             result = str(data)
+        elif data is not None:
+            result = data
         return result.encode()
