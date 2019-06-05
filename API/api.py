@@ -1,6 +1,7 @@
 import cherrypy
 import pymongo
 import requests
+import pickle
 
 
 @cherrypy.expose
@@ -28,14 +29,16 @@ class API(object):
     @cherrypy.tools.json_in()
     def POST(self, action=None):
         info = cherrypy.request.json
+        result = ""
         if action == "register_agent":
-            return self.register_agent(info)
+            result = self.register_agent(info)
         elif action == "request_service":
-            return self.request_service(info)
+            result = self.request_service(info)
         elif action == "execute_service":
-            return self.execute_service(info)
+            result = self.execute_service(info)
         elif action == "response_service":
-            return self.response_service(info)
+            result = self.response_service(info)
+        return self.return_data(result)
 
     @cherrypy.tools.json_in()
     def PUT(self, action=None):
@@ -187,3 +190,11 @@ class API(object):
             pass
         except Exception as e:
             print(e)
+
+    def return_data(self, data):
+        result = ""
+        if isinstance(data, dict):
+            result = pickle.dumps(dict)
+        elif isinstance(data, int):
+            result = str(data)
+        return result.encode()
