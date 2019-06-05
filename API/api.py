@@ -136,20 +136,16 @@ class API(object):
             try:
                 registered = requests.post(self.leader_url + "/register_agent", json=self.agent.node_info)
                 status_code = registered.status_code
-                nodeID = registered.text.zfill(10)
+                self.agent.node_info["nodeID"] = registered.text.zfill(10)
             except:
                 status_code = -1
                 if self.agent.node_info["role"] != "agent":
-                    nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
-                    nodeID = str(nodeID).zfill(10)
-                    self.agent.node_info['_id'] = str(int(nodeID))
-                    self.agent_collection.insert_one(self.agent.node_info)
+                    self.register_agent(self.agent.node_info)
                     status_code = 200
             if status_code == 200:
-                self.agent.node_info["nodeID"] = nodeID
                 file = open("./config/agent.conf", "w")
                 print("ANTES DE ESCRIBIR")
-                file.write("nodeID={}".format(nodeID))
+                file.write("nodeID={}".format(self.agent.node_info["nodeID"]))
                 print("DESPUES DE ESCRIBIR")
                 file.close()
                 print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
