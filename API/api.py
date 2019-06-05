@@ -29,13 +29,13 @@ class API(object):
     def POST(self, action=None):
         info = cherrypy.request.json
         if action == "register_agent":
-            self.register_agent(info)
+            return self.register_agent(info)
         elif action == "request_service":
-            self.request_service(info)
+            return self.request_service(info)
         elif action == "execute_service":
-            self.execute_service(info)
+            return self.execute_service(info)
         elif action == "response_service":
-            self.response_service(info)
+            return self.response_service(info)
 
     @cherrypy.tools.json_in()
     def PUT(self, action=None):
@@ -87,6 +87,7 @@ class API(object):
             self.agent_collection.insert_one(body)
         except pymongo.errors.DuplicateKeyError as e:
             nodeID = self.register_agent(body)
+        print(str(int(nodeID)))
         return str(int(nodeID))
 
     def get_agents(self, selec=None):
