@@ -22,7 +22,7 @@ class ServiceExecution:
             if "dependencies" not in service.keys():
                 if self.requester_can_execute(service):
                     self.agent.API.delegate_service(service, service["origin_ip"])
-                elif self.can_execute_service(server, self.agent.node_info):
+                elif self.can_execute_service(service, self.agent.node_info):
                     self.agent.API.delegate_service(service, self.agent.node_info["myIP"])
                 else:
                     agent_ip = self.find_agent_to_execute(service)
