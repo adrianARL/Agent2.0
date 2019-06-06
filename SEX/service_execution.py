@@ -38,8 +38,11 @@ class ServiceExecution:
                         self.agent.API.send_result(agent_ip, unattended_result)
 
     def requester_can_execute(self, service):
-        agent_info = self.agent.API.get_agents({"myIP": service["origin_ip"]})
-        return self.can_execute_service(service, agent_info)
+        if "origin_ip" in service:
+            agent_info = self.agent.API.get_agents({"myIP": service["origin_ip"]})
+            return self.can_execute_service(service, agent_info)
+        else:
+            return False
 
     def attend_service_dependencies(self, service):
         dependencies = []
