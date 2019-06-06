@@ -12,29 +12,34 @@ class ServiceExecution:
         self.service_ids = {}
         Thread(target=self.process_results).start()
 
-
     def request_service(self, service):
-        reg_service = {}
-        if self.agent.node_info["role"] != "agent":
-            reg_service = self.agent.API.get_service(service)
-            print()
-            print(reg_service)
-            print()
-        self.fill_service(service, reg_service)
-        if 'dependencies' in service.keys() and self.can_execute_service(service, self.agent.node_info) and "dependencies_done" not in service.keys():
-            print("Tiene dependencias")
-            Thread(target=self.attend_service_dependencies, args=(service, )).start()
+        if self.agent.node_info["role"] == "agent":
+            self.fill_service(service)
+            self.agent.API.request_service_to_leader(service)
         else:
-            print("No tiene dependencias")
-            if self.can_execute_service(service, self.agent.node_info):
-                print("Puedo ejecutar {}".format(service.get("service_id")))
-                self.agent.API.execute_service(service)
-            elif(self.agent.node_info["role"] != "agent"):
-                print("Delego el servicio a un agent {}".format(service.get("service_id")))
-                self.attend_service(service)
-            else:
-                self.agent.API.request_service_to_leader(service)
+            reg_service = self.agent.API.get_service(service)
+            self.fill_service(service, reg_service)
+            if "dependencies" not in service.keys():
+                if self.requester_can_execute(service):
+                    self.agent.API.delegate_service(service, service["origin_ip"])
+                elif self.can_execute_service(server, self.agent.node_info):
+                    self.agent.API.delegate_service(service, self.agent.node_info["myIP"])
+                else:
+                    agent_ip = self.find_agent_to_execute(service)
+                    if agent_ip:
+                        self.agent.API.delegate_service(service, agent_ip)
+                    else:
+                        unattended_result = {
+                            "type": "service_result",
+                            "id": service["origin_id"],
+                            "status": "unattended",
+                            "output": ""
+                        }
+                        self.agent.API.send_result(agent_ip, unattended_result)
 
+    def requester_can_execute(self, service):
+        agent_info = self.agent.API.get_agents({"myIP": service["origin_ip"]})
+        return self.can_execute_service(service, agent_info):
 
     def attend_service_dependencies(self, service):
         dependencies = []
@@ -138,7 +143,7 @@ class ServiceExecution:
                 #         self.agent.send_dict(service_result)
 
 
-    def fill_service(self, service, reg_service):
+    def fill_service(self, service, reg_service={}):
         random_id = str(self.agent.generate_service_id())
         if "id" in service.keys():
             service["origin_id"] = service["id"]
