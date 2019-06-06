@@ -39,7 +39,7 @@ class ServiceExecution:
 
     def requester_can_execute(self, service):
         agent_info = self.agent.API.get_agents({"myIP": service["origin_ip"]})
-        return self.can_execute_service(service, agent_info):
+        return self.can_execute_service(service, agent_info)
 
     def attend_service_dependencies(self, service):
         dependencies = []
