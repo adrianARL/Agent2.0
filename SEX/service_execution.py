@@ -40,9 +40,25 @@ class ServiceExecution:
     def requester_can_execute(self, service):
         if "origin_ip" in service:
             agent_info = self.agent.API.get_agents({"myIP": service["origin_ip"]})
+            if len(agent_info) > 0:
+                agent_info = agent_info[0]
             return self.can_execute_service(service, agent_info)
         else:
             return False
+
+
+
+    def find_agent_to_execute(self, service):
+        agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
+        print(agents)
+        if(agents):
+            for agent in agents:
+                if(self.can_execute_service(service, agent)):
+                    return  agent["myIP"]
+        return None
+
+
+
 
     def attend_service_dependencies(self, service):
         dependencies = []
@@ -69,34 +85,14 @@ class ServiceExecution:
         return random_id
 
 
-    def attend_service(self, service):
-        agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
-        print(agents)
-        attended = False
-        if(agents):
-            for agent in agents:
-                if(self.can_execute_service(service, agent)):
-                    self.agent.API.delegate_service(service, agent["myIP"])
-                    attended = True
-                    break
-        if not attended:
-            result = {
-                "type": "service_result",
-                "id": service["id"],
-                "status": "unattended",
-                "output": ""
-            }
-            self.agent.services_results.append(result)
-
-
 
 
     def can_execute_service(self, service, node_info):
-        # print()
-        # print(service.get("IoT"))
-        # print(node_info.get("IoT"))
-        # print()
         try:
+            print()
+            print(service)
+            print(node_info)
+            print()
             return set(service["IoT"]).issubset(set(node_info["IoT"]))
         except:
             return False
