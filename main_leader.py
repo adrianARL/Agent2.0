@@ -13,7 +13,7 @@ node_id = {
 	"leaderIP" : '10.10.176.123',
 	# "leaderIP" : '192.168.1.134',
 	"port" : 5000,
-	"IoT" : ["-", "rfid"],
+	"IoT" : ["-", "semaforo"],
 	"broadcastIP" : subprocess.getoutput("ip a | grep inet | grep brd | awk '{print $4}'"),
 	"cpu" : psutil.cpu_percent(),
 	"ram" : psutil.virtual_memory()[2],
