@@ -67,6 +67,7 @@ class RunTime:
             print("Ya he descargado")
 
     def get_dependencies_codes(self, codes):
+        print("VOY A DESCARGAR ", codes)
         if codes:
             for code in codes.split(" "):
                 self.get_code(code)
