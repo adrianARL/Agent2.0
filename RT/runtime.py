@@ -24,7 +24,10 @@ class RunTime:
                 self.agent.API.send_result(result, service["origin_ip"])
             else:
                 result = self.get_result(service["id"], output, "success")
-                self.agent.API.send_result(result, service["origin_ip"])
+                if "origin_ip" in service.keys():
+                    self.agent.API.send_result(result, service["origin_ip"])
+                else:
+                    self.agent.API.send_result(result, self.agent.node_info["myIP"])
         else:
             port = self.port
             params = self.add_params(params)
