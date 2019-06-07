@@ -33,7 +33,7 @@ class ServiceExecution:
                 self.pending_services[service["id"]] = service
                 for dependency in service["dependencies"]:
                     service_to_delegate = {'params': service['params']}
-                    reg_dependency = self.agent.API.get_service(dependency)
+                    reg_dependency = self.agent.API.get_service({"service_id": dependency})
                     self.fill_service(service_to_delegate, reg_dependency)
                     self.running_dependencies[service["id"]].append(service_to_delegate["id"])
                     self.dependency_of[service_to_delegate["id"]] = service["id"]
