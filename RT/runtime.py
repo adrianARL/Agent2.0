@@ -21,7 +21,10 @@ class RunTime:
             output = self.execute_code(code, params)
             if self.check_error(output):
                 result = self.get_result(service["id"], output, "error")
-                self.agent.API.send_result(result, service["origin_ip"])
+                if "origin_ip" in service.keys():
+                    self.agent.API.send_result(result, service["origin_ip"])
+                else:
+                    self.agent.API.send_result(result, self.agent.node_info["myIP"])
             else:
                 result = self.get_result(service["id"], output, "success")
                 if "origin_ip" in service.keys():
