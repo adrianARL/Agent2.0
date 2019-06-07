@@ -67,7 +67,8 @@ class RunTime:
         result = ""
         if params:
             for key, value in params.items():
-                result += key + "=" + str(value) + " "
+                if not value is None and value != "":
+                    result += key + "=" + str(value) + " "
         return result
 
     def execute_code(self, code, params):
