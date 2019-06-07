@@ -1,5 +1,6 @@
 import time
 import uuid
+import pickle
 from threading import Thread
 # from frontend_connection import FrontendConnection
 
@@ -8,8 +9,9 @@ class ServiceExecution:
 
     def __init__(self, agent):
         self.agent = agent
-        self.th_attend_services = []
-        self.service_ids = {}
+        self.running_dependencies = {}
+        self.dependency_of = {}
+        self.pending_services = {}
         Thread(target=self.process_results).start()
 
     def request_service(self, service):
@@ -25,17 +27,73 @@ class ServiceExecution:
                 elif self.can_execute_service(service, self.agent.node_info):
                     self.agent.API.delegate_service(service, self.agent.node_info["myIP"])
                 else:
-                    agent_ip = self.find_agent_to_execute(service)
-                    if agent_ip:
-                        self.agent.API.delegate_service(service, agent_ip)
+                    self.delegate_service(service)
+            else:
+                self.running_dependencies[service["id"]] = []
+                self.pending_services[service["id"]] = service
+                for dependency in service["dependencies"]:
+                    service_to_delegate = {'params': service['params']}
+                    reg_dependency = self.agent.API.get_service(dependency)
+                    self.fill_service(service_to_delegate, reg_dependency)
+                    self.running_dependencies[service["id"]].append(service_to_delegate["id"])
+                    self.dependency_of[service_to_delegate["id"]] = service["id"]
+                    if "dependencies" in service_to_delegate.keys():
+                        self.agent.API.request_service(service_to_delegate, self.agent.node_info["myIP"])
                     else:
-                        unattended_result = {
-                            "type": "service_result",
-                            "id": service["origin_id"],
-                            "status": "unattended",
-                            "output": ""
-                        }
-                        self.agent.API.send_result(agent_ip, unattended_result)
+                        if self.can_execute_service(service, self.agent.node_info):
+                            self.agent.API.delegate_service(service, self.agent.node_info["myIP"])
+                        else:
+                            self.delegate_service(service_to_delegate)
+
+    def attend_response(self, service_response):
+        if service_response["id"] in self.dependency_of.keys():
+            pending_service_id = self.dependency_of[service_response["id"]]
+            service_pending = self.pending_services[pending_service_id]
+            if service_response["status"] == "success":
+                params = pickle.loads(service_response["output"])
+                self.merge_params[service_pending, params]
+                del self.dependency_of[service_response["id"]]
+                self.running_dependencies[pending_service_id].remove(service_response["id"])
+                if not self.running_dependencies[pending_service_id]:
+                    if self.requester_can_execute(service_pending):
+                        self.agent.API.delegate_service(service_pending, service_pending["origin_ip"])
+                    elif self.can_execute_service(service_pending, self.agent.node_info):
+                        self.agent.API.delegate_service(service_pending, self.agent.node_info["myIP"])
+                    else:
+                        self.delegate_service(service_pending)
+            elif service_response["status"] == "error":
+                dependencies = self.running_dependencies[pending_service_id]
+                for dependency in dependencies:
+                    del self.dependency_of[dependency]
+                del self.running_dependencies[pending_service_id]
+                service_response["id"] = pending_service_id
+                if "origin_ip" in service_pending.keys():
+                    self.agent.API.send_result(service_pending["origin_ip"], service_response)
+                else:
+                    self.agent.API.send_result(self.agent.node_info["myIP"], service_response)
+        else:
+            print("MENSAJE FINAL = {}".format(service_response))
+
+
+
+    def merge_params(self, service, params):
+        if "params" not in service.keys():
+            service["params"] = {}
+        for param in params.keys():
+            service["params"][param] = params[param]
+
+    def delegate_service(self, service):
+        agent_ip = self.find_agent_to_execute(service)
+        if agent_ip:
+            self.agent.API.delegate_service(service, agent_ip)
+        else:
+            unattended_result = {
+                "type": "service_result",
+                "id": service["origin_id"],
+                "status": "unattended",
+                "output": ""
+            }
+            self.agent.API.send_result(agent_ip, unattended_result)
 
     def requester_can_execute(self, service):
         if "origin_ip" in service:
@@ -46,8 +104,6 @@ class ServiceExecution:
         else:
             return False
 
-
-
     def find_agent_to_execute(self, service):
         agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
         print(agents)
@@ -56,9 +112,6 @@ class ServiceExecution:
                 if(self.can_execute_service(service, agent)):
                     return  agent["myIP"]
         return None
-
-
-
 
     def attend_service_dependencies(self, service):
         dependencies = []
@@ -71,8 +124,6 @@ class ServiceExecution:
         service["dependencies_done"] = True
         self.agent.services.append(service)
 
-
-
     def add_service(self, service_id):
         reg_service = self.agent.topology_manager.get_service(service_id)
         random_id = self.agent.generate_service_id()
@@ -83,9 +134,6 @@ class ServiceExecution:
         self.agent.generated_services_id.append(randrequesom_id)
         self.agent.services.append(reg_service)
         return random_id
-
-
-
 
     def can_execute_service(self, service, node_info):
         try:
@@ -119,28 +167,6 @@ class ServiceExecution:
                     else:
                         print("Me quedo con el resultado {}".format(service_result.get("output")))
                         self.agent.my_services_results.append(service_result)
-
-
-
-                # if service_result["id"] in self.agent.generated_services_id:
-                #     self.agent.my_services_results.append(service_result)
-                #     print(self.agent.generated_services_id)
-                #     origin = self.service_ids.get(service_result["id"])
-                #     if origin and origin["origin_id"] in self.agent.generated_services_id :
-                #         self.agent.generated_services_id.remove(origin["origin_id"])
-                #     self.agent.generated_services_id.remove(service_result["id"])
-                #     print("He removido ", service_result["id"])
-                #     print(self.agent.generated_services_id)
-                # else:
-                #     if self.agent.node_info["role"] != "agent":
-                #         id = service_result["id"]
-                #         agent_id = self.service_ids[id]["agent_id"]
-                #         service_result["id"] = self.service_ids[id]["origin_id"]
-                #         print("Respondo: ", service_result)
-                #         self.agent.send_dict_to(service_result, agent_id)
-                #     else:
-                #         self.agent.send_dict(service_result)
-
 
     def fill_service(self, service, reg_service={}):
         random_id = str(self.agent.generate_service_id())

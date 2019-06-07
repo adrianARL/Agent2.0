@@ -136,8 +136,7 @@ class API(object):
         self.agent.runtime.execute_service(service)
 
     def response_service(self, service_result):
-        pass
-        # self.agent.service_execution.add_service_result(service_result)
+        self.agent.service_execution.attend_response(service_result)
 
     def register_to_leader(self):
         if 'nodeID' not in self.agent.node_info:
