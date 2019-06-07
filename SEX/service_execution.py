@@ -158,5 +158,5 @@ class ServiceExecution:
         # }
         self.agent.generated_services_id.append(random_id)
         for key in reg_service.keys():
-            if not key in service.keys():
+            if key not in service.keys() and key != "params":
                 service[key] = reg_service[key]
