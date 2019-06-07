@@ -43,7 +43,7 @@ class RunTime:
             "type": "service_result",
             "id": service_id,
             "status": status,
-            "output", output
+            "output": output
         }
 
     def check_error(self, output):
@@ -60,7 +60,7 @@ class RunTime:
             print("Ya he descargado")
 
     def prepare_params(self, service):
-        params = service.get("params"):
+        params = service.get("params")
         result = ""
         if params:
             for key, value in params.items():
