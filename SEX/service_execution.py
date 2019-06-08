@@ -39,8 +39,8 @@ class ServiceExecution:
                     if "dependencies" in service_to_delegate.keys():
                         self.agent.API.request_service(service_to_delegate, self.agent.node_info["myIP"])
                     else:
-                        if self.can_execute_service(service, self.agent.node_info):
-                            self.agent.API.delegate_service(service, self.agent.node_info["myIP"])
+                        if self.can_execute_service(service_to_delegate, self.agent.node_info):
+                            self.agent.API.delegate_service(service_to_delegate, self.agent.node_info["myIP"])
                         else:
                             self.delegate_service(service_to_delegate)
 
