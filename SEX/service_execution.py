@@ -61,6 +61,9 @@ class ServiceExecution:
                     else:
                         self.delegate_service(service_pending)
             elif service_response["status"] == "error":
+                print(service_response)
+                print()
+                print(self.pending_services)
                 dependencies = self.running_dependencies[pending_service_id]
                 for dependency in dependencies:
                     del self.dependency_of[dependency]
@@ -70,7 +73,7 @@ class ServiceExecution:
                     self.agent.API.send_result(service_response, service_pending["origin_ip"])
                 else:
                     self.agent.API.send_result(service_response, self.agent.node_info["myIP"])
-                del self.pending_services[service_response["id"]]
+                del self.pending_services[self.dependency_of.[service_response["id"]]
         elif service_response.get("id") and self.pending_services.get(service_response.get("id")):
             service_pending = self.pending_services[service_response["id"]]
             if "origin_ip" in service_pending.keys():
