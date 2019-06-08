@@ -45,7 +45,13 @@ class ServiceExecution:
                             self.delegate_service(service_to_delegate)
 
     def attend_response(self, service_response):
-        if service_response["id"] in self.dependency_of.keys():
+        if service_response.get("origin_ip") and service_response["origin_ip"] != self.agent.node_info["myIP"]:
+            del service_response["origin_ip"]
+            if self.agent.node_info["role"] == "agent":
+                self.agent.API.send_result(service_response, self.agent.node_info["leaderIP"])
+            else:
+                self.agent.API.send_result(service_response, service_response["origin_ip"])
+        elif service_response["id"] in self.dependency_of.keys():
             pending_service_id = self.dependency_of[service_response["id"]]
             service_pending = self.pending_services[pending_service_id]
             if service_response["status"] == "success":
