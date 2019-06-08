@@ -12,7 +12,6 @@ class ServiceExecution:
         self.running_dependencies = {}
         self.dependency_of = {}
         self.pending_services = {}
-        Thread(target=self.process_results).start()
 
     def request_service(self, service):
         if self.agent.node_info["role"] == "agent":
@@ -106,7 +105,6 @@ class ServiceExecution:
 
     def find_agent_to_execute(self, service):
         agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
-        print(agents)
         if(agents):
             for agent in agents:
                 if(self.can_execute_service(service, agent)):
@@ -137,36 +135,11 @@ class ServiceExecution:
 
     def can_execute_service(self, service, node_info):
         try:
-            print()
-            print(service)
-            print(node_info)
-            print()
             return set(service["IoT"]).issubset(set(node_info["IoT"]))
         except:
             return False
 
-    def process_results(self):
-        while True:
-            if len(self.agent.services_results) > 0:
-                service_result = self.agent.services_results.pop(0)
-                origin = self.service_ids.get(service_result["id"])
-                if origin:
-                    if service_result["id"] in self.agent.generated_services_id:
-                        self.agent.generated_services_id.remove(service_result["id"])
-                    if origin["origin_id"] in self.agent.generated_services_id:
-                        self.agent.generated_services_id.remove(origin["origin_id"])
-                    service_result["id"] = origin["origin_id"]
-                    if origin["agent_id"] != self.agent.node_info["nodeID"]:
-                        if self.agent.node_info["role"] != "agent":
-                            agent_id = origin["agent_id"]
-                            requesprint("Devuelvo el resultado {} al agent {} ".format(service_result.get("output"), agent_id))
-                            self.agent.send_dict_to(service_result, agent_id)
-                        else:
-                            print("Devuelvo el resultado {} al leader".format(service_result.get("output")))
-                            self.agent.send_dict(service_result)
-                    else:
-                        print("Me quedo con el resultado {}".format(service_result.get("output")))
-                        self.agent.my_services_results.append(service_result)
+
 
     def fill_service(self, service, reg_service={}):
         random_id = str(self.agent.generate_service_id())

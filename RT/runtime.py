@@ -62,12 +62,9 @@ class RunTime:
 
     def get_code(self, code):
         if not self.has_service_code(code):
-            print("Voy a descargar de FTP")
             self.get_remote_file(code)
-            print("Ya he descargado")
 
     def get_dependencies_codes(self, codes):
-        print("VOY A DESCARGAR ", codes)
         if codes:
             for code in codes.split(" "):
                 self.get_code(code)

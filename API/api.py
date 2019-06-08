@@ -32,7 +32,6 @@ class API(object):
     @cherrypy.tools.json_in()
     def POST(self, action=None):
         info = cherrypy.request.json
-        print(info)
         result = ""
         if action == "register_agent":
             result = self.register_agent(info)
@@ -42,7 +41,6 @@ class API(object):
             result = self.execute_service(info)
         elif action == "response_service":
             result = self.response_service(info)
-        print("Result: ",result)
         return self.return_data(result)
 
     @cherrypy.tools.json_in()
@@ -57,7 +55,6 @@ class API(object):
             self.delete_agent(info)
 
     def OPTIONS(self, a=None, b=None):
-        print("opcioneeeeees")
         cherrypy.response.headers['Access-Control-Allow-Headers'] = 'Access-Control-Allow-Origin, Content-Type'
         cherrypy.response.headers['Access-Control-Allow-Origin'] = '*'
         cherrypy.response.headers['Content-Type'] = '*'
@@ -96,7 +93,6 @@ class API(object):
             self.agent.agents_alive[body["myIP"]] = 1
         except pymongo.errors.DuplicateKeyError as e:
             nodeID = self.register_agent(body)
-        print(str(int(nodeID)))
         return str(int(nodeID))
 
     def get_agents(self, selec=None):
@@ -152,9 +148,7 @@ class API(object):
                     status_code = 200
             if status_code == 200:
                 file = open("./config/agent.conf", "w")
-                print("ANTES DE ESCRIBIR")
                 file.write("nodeID={}".format(self.agent.node_info["nodeID"]))
-                print("DESPUES DE ESCRIBIR")
                 file.close()
                 print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
             else:
