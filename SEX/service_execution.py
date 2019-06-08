@@ -67,9 +67,9 @@ class ServiceExecution:
                 del self.running_dependencies[pending_service_id]
                 service_response["id"] = pending_service_id
                 if "origin_ip" in service_pending.keys():
-                    self.agent.API.send_result(service_pending["origin_ip"], service_response)
+                    self.agent.API.send_result(service_response, service_pending["origin_ip"])
                 else:
-                    self.agent.API.send_result(self.agent.node_info["myIP"], service_response)
+                    self.agent.API.send_result(service_response, self.agent.node_info["myIP"])
         else:
             print("MENSAJE FINAL = {}".format(service_response))
 
@@ -92,7 +92,7 @@ class ServiceExecution:
                 "status": "unattended",
                 "output": ""
             }
-            self.agent.API.send_result(agent_ip, unattended_result)
+            self.agent.API.send_result(unattended_result, agent_ip)
 
     def requester_can_execute(self, service):
         if "origin_ip" in service:
