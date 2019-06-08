@@ -112,7 +112,6 @@ class ServiceExecution:
                 self.agent.API.send_result(unattended_result, service_pending["origin_ip"])
             else:
                 self.agent.API.send_result(unattended_result, self.agent.node_info["myIP"])
-            del self.pending_services[pending_service_id]
 
 
     def requester_can_execute(self, service):
