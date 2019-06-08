@@ -9,6 +9,7 @@ class API(object):
 
     IP_DB = '10.0.2.16'
     # IP_DB = '127.0.0.1'
+
     PORT_DB = 27017
 
     def __init__(self, agent, host='localhost', port=8000):
@@ -16,7 +17,7 @@ class API(object):
         self.host = host
         self.port = port
         self.leader_url = "http://{}:8000".format(self.agent.node_info['leaderIP'])
-        client = pymongo.MongoClient(self.IP_DB, self.PORT_DB)
+        client = pymongo.MongoClient(self.agent.node_info["ipDB"], self.agent.node_info["portDB"])
         self.agent_collection = client.globalDB.nodes
         self.service_catalog = client.globalDB.service_catalog
 
