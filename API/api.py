@@ -159,6 +159,7 @@ class API(object):
 
     def delegate_service(self, service, agent_ip):
         try:
+            self.pending_services[service["id"]] = service
             print("DELEGATE SERVICE: ", service)
             status_code = requests.post("http://"+agent_ip+":8000/execute_service", json=service).status_code
         except Exception as e:

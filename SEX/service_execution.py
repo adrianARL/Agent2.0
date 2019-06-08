@@ -45,6 +45,7 @@ class ServiceExecution:
                             self.delegate_service(service_to_delegate)
 
     def attend_response(self, service_response):
+        print(self.pending_services)
         if service_response["id"] in self.dependency_of.keys():
             pending_service_id = self.dependency_of[service_response["id"]]
             service_pending = self.pending_services[pending_service_id]
