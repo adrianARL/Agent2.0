@@ -51,7 +51,7 @@ class ServiceExecution:
             service_pending = self.pending_services[pending_service_id]
             if service_response["status"] == "success":
                 params = json.loads(service_response["output"])
-                self.merge_params[service_pending, params]
+                self.merge_params(service_pending, params)
                 del self.dependency_of[service_response["id"]]
                 self.running_dependencies[pending_service_id].remove(service_response["id"])
                 if not self.running_dependencies[pending_service_id]:
