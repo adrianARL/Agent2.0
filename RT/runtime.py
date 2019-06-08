@@ -23,12 +23,14 @@ class RunTime:
             if self.check_error(output):
                 result = self.get_result(service["id"], output, "error")
                 if "origin_ip" in service.keys():
+                    result["origin_ip"] = service["origin_ip"]
                     self.agent.API.send_result(result, service["origin_ip"])
                 else:
                     self.agent.API.send_result(result, self.agent.node_info["myIP"])
             else:
                 result = self.get_result(service["id"], output, "success")
                 if "origin_ip" in service.keys():
+                    result["origin_ip"] = service["origin_ip"]
                     self.agent.API.send_result(result, service["origin_ip"])
                 else:
                     self.agent.API.send_result(result, self.agent.node_info["myIP"])
@@ -38,6 +40,7 @@ class RunTime:
             Thread(target=self.execute_code, args=(code, params)).start()
             output = "ip={} port={}".format(self.agent.node_info["myIP"], port)
             result = self.get_result(service["id"], output, "success")
+            result["origin_ip"] = service["origin_ip"]
             self.agent.API.send_result(result, service["origin_ip"])
 
     def add_params(self, params):
