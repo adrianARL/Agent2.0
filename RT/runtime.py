@@ -19,7 +19,7 @@ class RunTime:
         self.get_code(code)
         self.get_dependencies_codes(service.get("dependencies_codes"))
         if not service["is_infinite"]:
-            output = self.execute_code(code, params)
+            output = self.execute_code(service["python_version"], code, params)
             if self.check_error(output):
                 result = self.get_result(service["id"], output, "error")
                 if "origin_ip" in service.keys():
@@ -78,12 +78,12 @@ class RunTime:
                     result += key + "=" + str(value) + " "
         return result
 
-    def execute_code(self, code, params):
+    def execute_code(self, python_version, code, params):
         if params:
-            output = subprocess.getoutput("python ./codes/" + code + " " + params)
+            output = subprocess.getoutput(python_version + " ./codes/" + code + " " + params)
             # dentro del code.py que se ejecuta para obtener params: params = sys.argv[1].split(" ")
         else:
-            output = subprocess.getoutput("python ./codes/" + code)
+            output = subprocess.getoutput(python_version + " ./codes/" + code)
         return output
 
     def get_remote_file(self, code):
