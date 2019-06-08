@@ -70,6 +70,7 @@ class ServiceExecution:
                     self.agent.API.send_result(service_response, service_pending["origin_ip"])
                 else:
                     self.agent.API.send_result(service_response, self.agent.node_info["myIP"])
+                del self.pending_services[service_response["id"]]
         elif service_response.get("id") and self.pending_services.get(service_response.get("id")):
             service_pending = self.pending_services[service_response["id"]]
             if "origin_ip" in service_pending.keys():
@@ -90,16 +91,29 @@ class ServiceExecution:
 
     def delegate_service(self, service):
         agent_ip = self.find_agent_to_execute(service)
+        print(service)
+        print(self.pending_services)
         if agent_ip:
             self.agent.API.delegate_service(service, agent_ip)
-        else:
+        elif service["id"] in self.dependency_of.keys():
+            pending_service_id = self.dependency_of[service["id"]]
+            service_pending = self.pending_services[pending_service_id]
+            dependencies = self.running_dependencies[pending_service_id]
+            for dependency in dependencies:
+                del self.dependency_of[dependency]
+            del self.running_dependencies[pending_service_id]
             unattended_result = {
                 "type": "service_result",
-                "id": service["origin_id"],
+                "id": pending_service_id,
                 "status": "unattended",
                 "output": ""
             }
-            self.agent.API.send_result(unattended_result, agent_ip)
+            if "origin_ip" in service_pending.keys():
+                self.agent.API.send_result(unattended_result, service_pending["origin_ip"])
+            else:
+                self.agent.API.send_result(unattended_result, self.agent.node_info["myIP"])
+            del self.pending_services[pending_service_id]
+
 
     def requester_can_execute(self, service):
         if "origin_ip" in service:
