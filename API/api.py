@@ -127,12 +127,15 @@ class API(object):
             return None
 
     def request_service(self, service):
+        print("REQUEST_SERVICE:", service)
         self.agent.service_execution.request_service(service)
 
     def execute_service(self, service):
+        print("EXECUTE_SERVICE: ", service)
         self.agent.runtime.execute_service(service)
 
     def response_service(self, service_result):
+        print("RESPONSE_SERVICE: ", service_result)
         self.agent.service_execution.attend_response(service_result)
 
     def register_to_leader(self):
