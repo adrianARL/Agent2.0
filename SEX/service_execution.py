@@ -45,7 +45,6 @@ class ServiceExecution:
                             self.delegate_service(service_to_delegate)
 
     def attend_response(self, service_response):
-        print(self.pending_services)
         if service_response["id"] in self.dependency_of.keys():
             pending_service_id = self.dependency_of[service_response["id"]]
             service_pending = self.pending_services[pending_service_id]
@@ -76,7 +75,7 @@ class ServiceExecution:
             if "origin_ip" in service_pending.keys():
                 self.agent.API.send_result(service_response, service_pending["origin_ip"])
             else:
-                self.agent.API.send_result(service_response, self.agent.node_info["myIP"])
+                print("MENSAJE FINAL = {}".format(service_response))
             del self.pending_services[service_response["id"]]
         else:
             print("MENSAJE FINAL = {}".format(service_response))
