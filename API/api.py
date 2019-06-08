@@ -127,15 +127,15 @@ class API(object):
             return None
 
     def request_service(self, service):
-        print("REQUEST_SERVICE:", service)
+        # print("REQUEST_SERVICE:", service)
         self.agent.service_execution.request_service(service)
 
     def execute_service(self, service):
-        print("EXECUTE_SERVICE: ", service)
+        # print("EXECUTE_SERVICE: ", service)
         self.agent.runtime.execute_service(service)
 
     def response_service(self, service_result):
-        print("RESPONSE_SERVICE: ", service_result)
+        # print("RESPONSE_SERVICE: ", service_result)
         self.agent.service_execution.attend_response(service_result)
 
     def register_to_leader(self):
@@ -159,8 +159,9 @@ class API(object):
 
     def delegate_service(self, service, agent_ip):
         try:
-            self.agent.service_execution.pending_services[service["id"]] = service
-            print("DELEGATE SERVICE: ", service)
+            if agent_ip != self.agent.node_info["myIP"]:
+                self.agent.service_execution.pending_services[service["id"]] = service
+            # print("DELEGATE SERVICE: ", service)
             status_code = requests.post("http://"+agent_ip+":8000/execute_service", json=service).status_code
         except Exception as e:
             print(e)
