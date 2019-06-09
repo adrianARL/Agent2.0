@@ -41,7 +41,6 @@ class RunTime:
                 "port": port
             }
             params = self.add_socket_params(params)
-            print(params)
             Thread(target=self.execute_code, args=(service["python_version"], code, params)).start()
             output = json.dumps({
                 "socket_ip": self.agent.node_info["myIP"],
