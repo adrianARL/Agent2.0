@@ -95,7 +95,7 @@ class ServiceExecution:
         if "params" not in service.keys():
             service["params"] = {}
         for param in params.keys():
-            if not isinstance(params[param], dict) and not isinstance(params[param], list)
+            if not isinstance(params[param], dict) and not isinstance(params[param], list):
                 service["params"][param] = params[param]
             else:
                 service["params"][param] = json.dumps(params[param])
