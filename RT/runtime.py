@@ -42,19 +42,19 @@ class RunTime:
             params = self.add_socket_params(params)
             print(params)
             Thread(target=self.execute_code, args=(service["python_version"], code, params)).start()
-            output = {
+            output = json.dumps({
                 "socket_ip": self.agent.node_info["myIP"],
                 "socket_port": port
-            }
+            })
             result = self.get_result(service["id"], output, "success")
             self.agent.API.send_result(result, service["ip"])
         else:
             ip = self.infinite_services[service["_id"]]["ip"]
             port = self.infinite_services[service["_id"]]["port"]
-            output = {
+            output = json.dumps({
                 "socket_ip": self.agent.node_info["myIP"],
                 "socket_port": port
-            }
+            })
             result = self.get_result(service["id"], output, "success")
             self.agent.API.send_result(result, service["ip"])
 
