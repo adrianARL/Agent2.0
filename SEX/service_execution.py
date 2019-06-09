@@ -30,12 +30,15 @@ class ServiceExecution:
             else:
                 self.running_dependencies[service["id"]] = []
                 self.pending_services[service["id"]] = service
+                services_to_delegate = []
                 for dependency in service["dependencies"]:
                     service_to_delegate = {'params': service['params']}
                     reg_dependency = self.agent.API.get_service({"service_id": dependency})
                     self.fill_service(service_to_delegate, reg_dependency)
                     self.running_dependencies[service["id"]].append(service_to_delegate["id"])
                     self.dependency_of[service_to_delegate["id"]] = service["id"]
+                    services_to_delegate.append(service_to_delegate)
+                for service_to_delegate in services_to_delegate:
                     if "dependencies" in service_to_delegate.keys():
                         self.agent.API.request_service(service_to_delegate, self.agent.node_info["myIP"])
                     else:
@@ -45,6 +48,11 @@ class ServiceExecution:
                             self.delegate_service(service_to_delegate)
 
     def attend_response(self, service_response):
+        print()
+        print(self.running_dependencies)
+        print()
+        print(service_response)
+        print()
         if service_response["id"] in self.dependency_of.keys():
             pending_service_id = self.dependency_of[service_response["id"]]
             service_pending = self.pending_services[pending_service_id]
