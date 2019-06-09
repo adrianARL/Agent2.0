@@ -95,7 +95,10 @@ class ServiceExecution:
         if "params" not in service.keys():
             service["params"] = {}
         for param in params.keys():
-            service["params"][param] = params[param]
+            if not isinstance(params[param], dict) and not isinstance(params[param], list)
+                service["params"][param] = params[param]
+            else:
+                service["params"][param] = json.dumps(params[param])
 
     def delegate_service(self, service):
         agent_ip = self.find_agent_to_execute(service)
