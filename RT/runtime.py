@@ -12,6 +12,7 @@ class RunTime:
     def __init__(self, agent):
         self.agent = agent
         self.port = 5000
+        self.infinite_services = {}
 
     def execute_service(self, service):
         code = service["code"]
@@ -32,16 +33,36 @@ class RunTime:
                     self.agent.API.send_result(result, service["ip"])
                 else:
                     self.agent.API.send_result(result, self.agent.node_info["myIP"])
-        else:
+        elif service["_id"] not in self.infinite_services:
             port = self.port
-            params = self.add_params(params)
-            Thread(target=self.execute_code, args=(code, params)).start()
-            output = "ip={} port={}".format(self.agent.node_info["myIP"], port)
+            self.infinite_services[service["_id"]] = {
+                "ip": self.agent.node_info["myIP"],
+                "port": port
+            }
+            params = self.add_socket_params(params)
+            print(params)
+            Thread(target=self.execute_code, args=(service["python_version"], code, params)).start()
+            output = {
+                "socket_ip": self.agent.node_info["myIP"],
+                "socket_port": port
+            }
+            result = self.get_result(service["id"], output, "success")
+            self.agent.API.send_result(result, service["ip"])
+        else:
+            ip = self.infinite_services[service["_id"]]["ip"]
+            port = self.infinite_services[service["_id"]]["port"]
+            output = {
+                "socket_ip": self.agent.node_info["myIP"],
+                "socket_port": port
+            }
             result = self.get_result(service["id"], output, "success")
             self.agent.API.send_result(result, service["ip"])
 
-    def add_params(self, params):
-        params += "ip=" + self.agent.node_info["myIP"] + " port=" + self.port
+
+
+
+    def add_socket_params(self, params):
+        params += "ip=" + self.agent.node_info["myIP"] + " port=" + str(self.port)
         self.port += 2
         return params
 
