@@ -1,4 +1,4 @@
 *.pyc
 *.conf
 /codes/*.py
-/logs/*
+/logs/*.log
