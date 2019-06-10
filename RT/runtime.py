@@ -7,8 +7,8 @@ from ftplib import FTP
 
 class RunTime:
 
-    # FTP_SERVER = '10.1.136.179'
-    FTP_SERVER = '192.168.1.40'
+    FTP_SERVER = '10.1.136.179'
+    # FTP_SERVER = '192.168.1.40'
 
     def __init__(self, agent):
         self.agent = agent
@@ -41,7 +41,6 @@ class RunTime:
                 "port": port
             }
             params = self.add_socket_params(params)
-            print(params)
             Thread(target=self.execute_code, args=(service["python_version"], code, params)).start()
             output = json.dumps({
                 "socket_ip": self.agent.node_info["myIP"],
@@ -58,9 +57,6 @@ class RunTime:
             })
             result = self.get_result(service["id"], output, "success")
             self.agent.API.send_result(result, service["ip"])
-
-
-
 
     def add_socket_params(self, params):
         params += "ip=" + self.agent.node_info["myIP"] + " port=" + str(self.port)
@@ -93,6 +89,7 @@ class RunTime:
 
     def prepare_params(self, service):
         params = service.get("params")
+        print("PARAMS:", params)
         result = ""
         if params:
             for key, value in params.items():
@@ -101,10 +98,13 @@ class RunTime:
         return result
 
     def execute_code(self, python_version, code, params):
+        print("Voy a ejecutar:\n{}\n{}\n{}".format(python_version, code, params))
         if params:
+            print("HAY PARAMS")
             output = subprocess.getoutput(python_version + " ./codes/" + code + " " + params)
             # dentro del code.py que se ejecuta para obtener params: params = sys.argv[1].split(" ")
         else:
+            print("NO HAY PARAMS")
             output = subprocess.getoutput(python_version + " ./codes/" + code)
         return output
 

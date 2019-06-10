@@ -48,11 +48,6 @@ class ServiceExecution:
                             self.delegate_service(service_to_delegate)
 
     def attend_response(self, service_response):
-        print()
-        print(self.running_dependencies)
-        print()
-        print(service_response)
-        print()
         if service_response["id"] in self.dependency_of.keys():
             pending_service_id = self.dependency_of[service_response["id"]]
             service_pending = self.pending_services[pending_service_id]
@@ -61,6 +56,7 @@ class ServiceExecution:
                 self.merge_params(service_pending, params)
                 del self.dependency_of[service_response["id"]]
                 self.running_dependencies[pending_service_id].remove(service_response["id"])
+                self.pending_services[pending_service_id]
                 if not self.running_dependencies[pending_service_id]:
                     if self.requester_can_execute(service_pending):
                         self.agent.API.delegate_service(service_pending, service_pending["origin_ip"])
@@ -95,15 +91,11 @@ class ServiceExecution:
         if "params" not in service.keys():
             service["params"] = {}
         for param in params.keys():
-            if not isinstance(params[param], dict) and not isinstance(params[param], list):
-                service["params"][param] = params[param]
-            else:
-                service["params"][param] = json.dumps(params[param])
+            service["params"][param] = params[param]
+
 
     def delegate_service(self, service):
         agent_ip = self.find_agent_to_execute(service)
-        print(service)
-        print(self.pending_services)
         if agent_ip:
             self.agent.API.delegate_service(service, agent_ip)
         elif service["id"] in self.dependency_of.keys():

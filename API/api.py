@@ -7,11 +7,6 @@ import pickle
 @cherrypy.expose
 class API(object):
 
-    IP_DB = '10.0.2.16'
-    # IP_DB = '127.0.0.1'
-
-    PORT_DB = 27017
-
     def __init__(self, agent, host='localhost', port=8000):
         self.agent = agent
         self.host = host
@@ -131,7 +126,7 @@ class API(object):
         self.agent.service_execution.request_service(service)
 
     def execute_service(self, service):
-        # print("EXECUTE_SERVICE: ", service)
+        print("EXECUTE_SERVICE: ", service)
         self.agent.runtime.execute_service(service)
 
     def response_service(self, service_result):
