@@ -4,6 +4,7 @@ import json
 import socket
 import sqlite3
 import errno
+import serial
 from threading import Thread
 from util import get_params
 from frontend_connection import FrontendConnection
@@ -14,9 +15,15 @@ CARD_ID_REQUEST = "card_id_request"
 NESTED_LEADERS_REQUEST = "nested_leaders_request"
 EMERGENCY_DICT_REQUEST = "emergency_dict_request"
 REQUEST_TRAFFIC_LIGHT_STATUS = "requestTrafficLightStatus"
+SET_TRAFFIC_LIGHT_COLOR = "setTrafficLightColor"
 RESPONSE_TRAFFIC_LIGHT_COLOR = "responseTrafficLightColor"
 
 traffic_light_color = {
+    "1000" : "green",
+    "0100" : "yellow",
+    "0010" : "red"
+}
+color_traffic_light = {
     "green" : "1000",
     "yellow" : "0100",
     "red" : "0010"
@@ -111,40 +118,21 @@ ts2 = {
     }
 }
 
-def change_semafore_status():
+def read_arduino_traffic_light_status(arduino, _):
     while True:
-        for i in range(len(semaforos)):
-            if i%2 == 0:
-                traffic_light_status[semaforos[i]] = "green"
-                frontend.sendStatus(semaforos[i], traffic_light_color["green"])
-            else:
-                traffic_light_status[semaforos[i]] = "red"
-                frontend.sendStatus(semaforos[i], traffic_light_color["red"])
-        time.sleep(6)
-        for i in range(len(semaforos)):
-            if i%2 == 0:
-                traffic_light_status[semaforos[i]] = "yellow"
-                frontend.sendStatus(semaforos[i], traffic_light_color["yellow"])
-            else:
-                traffic_light_status[semaforos[i]] = "red"
-                frontend.sendStatus(semaforos[i], traffic_light_color["red"])
-        time.sleep(3)
-        for i in range(len(semaforos)):
-            if i%2 == 0:
-                traffic_light_status[semaforos[i]] = "red"
-                frontend.sendStatus(semaforos[i], traffic_light_color["red"])
-            else:
-                traffic_light_status[semaforos[i]] = "green"
-                frontend.sendStatus(semaforos[i], traffic_light_color["green"])
-        time.sleep(6)
-        for i in range(len(semaforos)):
-            if i%2 == 0:
-                traffic_light_status[semaforos[i]] = "red"
-                frontend.sendStatus(semaforos[i], traffic_light_color["red"])
-            else:
-                traffic_light_status[semaforos[i]] = "yellow"
-                frontend.sendStatus(semaforos[i], traffic_light_color["yellow"])
-        time.sleep(3)
+        try:
+            lectura = arduino.readline().decode().rstrip()
+            traffic_light, status= lectura.split('-')
+            traffic_light_status[traffic_light] = traffic_light_color[status]
+            if frontend:
+                frontend.sendStatus(traffic_light, status)
+        except:
+            pass
+
+def read_traffic_light_status():
+    for arduino in arduinos:
+        thread = Thread(target=read_arduino_traffic_light_status, args=(arduino, None))
+        thread.start()
 
 def bind_connection():
         my_socket.bind((ip, port))
@@ -177,9 +165,14 @@ def receive_request():
                     elif msg.split("_")[0] == REQUEST_TRAFFIC_LIGHT_STATUS:
                         traffic_light = msg.split("_")[1]
                         info = RESPONSE_TRAFFIC_LIGHT_COLOR+"_"+traffic_light_status[traffic_light]
-                    # elif msg.split('_')[0] == SET_TRAFFIC_LIGHT_SERVICE:
-                    #     data = msg.split('_')[1]
-                    #     set_traffic_light_service(data)
+                    elif msg.split('_')[0] == SET_TRAFFIC_LIGHT_COLOR:
+                        trafficlight_id = msg.split('_')[1]
+                        color = msg.split('_')[2]
+                        data = {
+                            'agente_id': trafficlight_id,
+                            'status': color_traffic_light[color]
+                        }
+                        on_receive_status(data)
                     if info != "":
                         print(info)
                         agent.send(info.encode())
@@ -224,6 +217,29 @@ def load_card_ids():
         card_ids[card_id[1]] = card_id[0]
     return card_ids
 
+def on_receive_status(*args):
+        data = args[0]
+        print(args)
+        print("Recibido cambio de estado para: "+data["agente_id"]+". Estado: "+data["status"])
+        if data["agente_id"] == "TW1":
+            code = '1'+data["status"]
+            arduinos[0].write(code.encode())
+        if data["agente_id"] == "TW2":
+            code = '2'+data["status"]
+            arduinos[0].write(code.encode())
+        if data["agente_id"] == "TS1":
+            code = '1'+data["status"]
+            arduinos[1].write(code.encode())
+        if data["agente_id"] == "TS2":
+            code = '2'+data["status"]
+            arduinos[1].write(code.encode())
+        frontend.sendStatus(data["agente_id"], data["status"])
+
+def receive_frontend_request():
+    if frontend:
+       frontend.socket.on("front/agent/status", on_receive_status)
+    while True:
+        frontend.wait(1)
 
 if __name__ == "__main__":
     try:
@@ -239,18 +255,21 @@ if __name__ == "__main__":
         emergency_dict = load_emergency_dict()
 
         agents = []
+        arduinos = [serial.Serial('/dev/ttyACM0', 9600), serial.Serial('/dev/ttyACM1', 9600)]
         my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         bind_connection()
         Thread(target=accept_connection).start()
         Thread(target=receive_request).start()
         frontend = FrontendConnection(host_frontend, port_frontend) # Conexion con Frontend
+        if frontend:
+            Thread(target=receive_frontend_request).start()
         traffic_light_status = {}
         semaforos = ["TW1", "TW2", "TS1", "TS2"]
         frontend.recognizeAgent(tw1)
         frontend.recognizeAgent(tw2)
         frontend.recognizeAgent(ts1)
         frontend.recognizeAgent(ts2)
-        Thread(target=change_semafore_status).start()
+        read_traffic_light_status()
 
     except Exception as e:
         print("ERROR:{}".format(e))
