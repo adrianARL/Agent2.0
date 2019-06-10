@@ -1,1 +1,1 @@
-Carpeta donde se guardaran los códigos descargados del FTP
+Carpeta donde se guardaran los logs
