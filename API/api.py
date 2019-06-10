@@ -18,7 +18,7 @@ class API(object):
         self.agent_collection = client.globalDB.nodes
         self.service_catalog = client.globalDB.service_catalog
         today = datetime.date.today()
-        logging.basicConfig(filename='/logs/{:%d%m%Y}.log'.format(today), filemode='w', format='%(process)d-%(levelname)s-%(message)s')
+        logging.basicConfig(filename='logs/{:%d%m%Y}.log'.format(today), filemode='w', format='%(process)d-%(levelname)s-%(message)s')
 
     def GET(self, obj=None, id=None):
         if obj == "agent":
