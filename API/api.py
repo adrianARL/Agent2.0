@@ -180,6 +180,7 @@ class API(object):
 
     def send_result(self, result, agent_ip):
         try:
+            print("RESULT", result)
             requests.post("http://"+agent_ip+":8000/response_service", json=result)
         except Exception as e:
             print(e)
