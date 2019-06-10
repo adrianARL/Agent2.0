@@ -1,6 +1,7 @@
 import os
 import json
 import subprocess
+import time
 from threading import Thread
 from ftplib import FTP
 
@@ -46,6 +47,7 @@ class RunTime:
                 "socket_ip": self.agent.node_info["myIP"],
                 "socket_port": port
             })
+            time.sleep(2)
             result = self.get_result(service["id"], output, "success")
             self.agent.API.send_result(result, service["ip"])
         else:
