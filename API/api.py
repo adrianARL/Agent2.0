@@ -130,7 +130,7 @@ class API(object):
             return None
 
     def request_service(self, service):
-        # print("REQUEST_SERVICE:", service)
+        print("REQUEST_SERVICE:", service)
         logging.info("IN REQUEST_SERVICE: {}".format(service))
         self.agent.service_execution.request_service(service)
 
