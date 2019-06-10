@@ -2,6 +2,7 @@ import cherrypy
 import pymongo
 import requests
 import pickle
+import logging
 
 
 @cherrypy.expose
@@ -15,6 +16,8 @@ class API(object):
         client = pymongo.MongoClient(self.agent.node_info["ipDB"], self.agent.node_info["portDB"])
         self.agent_collection = client.globalDB.nodes
         self.service_catalog = client.globalDB.service_catalog
+        today = datetime.date.today()
+        logging.basicConfig(filename='/logs/{:%d%m%Y}.log'.format(today), filemode='w', format='%(process)d-%(levelname)s-%(message)s')
 
     def GET(self, obj=None, id=None):
         if obj == "agent":
@@ -91,11 +94,13 @@ class API(object):
         return str(int(nodeID))
 
     def get_agents(self, selec=None):
+        logging.info("Entro a get_agents")
         if selec:
             try:
                 agent_list=[]
                 for agent_mongo in self.agent_collection.find(selec):
                     agent_list.append(agent_mongo)
+                logging.info("Salgo de get_agents con {}".format(agent_list))
                 return agent_list
             except Exception as e:
                 print(e)
@@ -112,10 +117,12 @@ class API(object):
             self.agent_collection.update({'myIP': ip},{"$set":body},True)
 
     def get_service(self, input=None):
+        logging.info("Entro a get_service con {}".format(input))
         if input:
             # obtener un servicio
             selec = {"_id": input["service_id"]}
             service = self.service_catalog.find_one(selec);
+            logging.info("Salgo de get_agents con {}".format(service))
             return service
         else:
             # obtener todos los servicios
@@ -123,14 +130,15 @@ class API(object):
 
     def request_service(self, service):
         # print("REQUEST_SERVICE:", service)
+        logging.info("IN REQUEST_SERVICE: {}".format(service))
         self.agent.service_execution.request_service(service)
 
     def execute_service(self, service):
-        print("EXECUTE_SERVICE: ", service)
+        logging.info("IN EXECUTE_SERVICE: {}".format(service))
         self.agent.runtime.execute_service(service)
 
     def response_service(self, service_result):
-        # print("RESPONSE_SERVICE: ", service_result)
+        logging.info("IN RESPONSE_SERVICE: {}".format(service_result))
         self.agent.service_execution.attend_response(service_result)
 
     def register_to_leader(self):
@@ -148,11 +156,13 @@ class API(object):
                 file = open("./config/agent.conf", "w")
                 file.write("nodeID={}".format(self.agent.node_info["nodeID"]))
                 file.close()
+                logging.info("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
                 print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
             else:
                 print("No se ha podido registrar el agent")
 
     def delegate_service(self, service, agent_ip):
+        logging.info("IN DELEGATE_SERVICE: {} - {}".format(agent_ip, service))
         try:
             if agent_ip != self.agent.node_info["myIP"]:
                 self.agent.service_execution.pending_services[service["id"]] = service
@@ -163,8 +173,12 @@ class API(object):
             status_code = -1
         if status_code != 200:
             print("No se ha podido delegar el servicio {} al agent".format(service["service_id"]))
+        logging.info("OUT DELEGATE_SERVICE: code {}".format(status_code))
+
 
     def request_service_to_leader(self, service):
+        logging.info("IN REQUEST_SERVICE_TO_LEADER: {}".format(service))
+
         try:
             status_code = requests.post(self.leader_url+"/request_service", json=service).status_code
         except Exception as e:
@@ -172,13 +186,17 @@ class API(object):
             status_code = -1
         if status_code != 200:
             print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
+        logging.info("OUT REQUEST_SERVICE_TO_LEADER: code {}".format(status_code))
 
     def send_result(self, result, agent_ip):
+        logging.info("IN SEND_RESULT: {} - {}".format(agent_ip, result))
+        status_code = -1
         try:
             print("RESULT", result)
-            requests.post("http://"+agent_ip+":8000/response_service", json=result)
+            status_code = requests.post("http://"+agent_ip+":8000/response_service", json=result)
         except Exception as e:
             print(e)
+        logging.info("OUT SEND_RESULT: code {}".format(status_code))
 
     def register_cloud_agent(self):
         body = self.agent.node_info
