@@ -3,7 +3,7 @@ import psutil
 import time
 from agent import Agent
 
-node_id = {
+node_info = {
 	"ipDB" : "10.0.2.16",
 	# "ipDB" : "192.168.1.45",
 	"portDB" : 8000,
@@ -20,7 +20,7 @@ node_id = {
 	"status" : 1
 }
 
-agent = Agent(node_id)
+agent = Agent(node_info)
 # time.sleep(2)
 #
 # params = {'start': 'NW', 'end': 'E4'}
