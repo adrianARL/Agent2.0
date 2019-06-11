@@ -2,14 +2,11 @@ import os
 import json
 import subprocess
 import time
+import requests
 from threading import Thread
-from ftplib import FTP
 
 
 class RunTime:
-
-    FTP_SERVER = '10.1.136.179'
-    # FTP_SERVER = '192.168.1.40'
 
     def __init__(self, agent):
         self.agent = agent
@@ -19,7 +16,7 @@ class RunTime:
     def execute_service(self, service):
         code = service["code"]
         params = self.prepare_params(service)
-        self.get_code(code)
+        self.get_code(code, service["params"])
         self.get_dependencies_codes(service.get("dependencies_codes"))
         if not service["is_infinite"]:
             output = self.execute_code(service["python_version"], code, params)
@@ -80,7 +77,7 @@ class RunTime:
         except:
             return False
 
-    def get_code(self, code):
+    def get_code(self, code, params):
         if not self.has_service_code(code):
             self.get_remote_file(code)
 
@@ -110,12 +107,10 @@ class RunTime:
             output = subprocess.getoutput(python_version + " ./codes/" + code)
         return output
 
-    def get_remote_file(self, code):
+    def get_remote_file(self, code, params):
         file = open("./codes/" + code, 'wb')
-        ftp = FTP(self.FTP_SERVER)
-        ftp.login()
-        ftp.cwd('files')
-        ftp.retrbinary('RETR ' + code, file.write, 1024)
+        content = requests.get("http://{}:{}/download/{}".format(params["host_frontend"], params["port_frontend"], code)).content
+        file.write(content)
         file.close()
 
     def has_service_code(self, code):
