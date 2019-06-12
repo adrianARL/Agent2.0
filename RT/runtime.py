@@ -17,7 +17,7 @@ class RunTime:
         code = service["code"]
         params = self.prepare_params(service)
         self.get_code(code, service["params"])
-        self.get_dependencies_codes(service.get("dependencies_codes"))
+        self.get_dependencies_codes(service.get("dependencies_codes"), service["params"])
         if not service["is_infinite"]:
             output = self.execute_code(service["python_version"], code, params)
             if self.check_error(output):
@@ -81,10 +81,10 @@ class RunTime:
         if not self.has_service_code(code):
             self.get_remote_file(code, params)
 
-    def get_dependencies_codes(self, codes):
+    def get_dependencies_codes(self, codes, params):
         if codes:
             for code in codes.split(" "):
-                self.get_code(code)
+                self.get_code(code, params)
 
     def prepare_params(self, service):
         params = service.get("params")
