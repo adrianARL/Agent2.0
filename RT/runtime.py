@@ -79,7 +79,7 @@ class RunTime:
 
     def get_code(self, code, params):
         if not self.has_service_code(code):
-            self.get_remote_file(code)
+            self.get_remote_file(code, params)
 
     def get_dependencies_codes(self, codes):
         if codes:
