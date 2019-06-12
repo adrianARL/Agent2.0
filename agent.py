@@ -41,7 +41,7 @@ class Agent:
     def get_attributes(self):
         config_file = Path("./config/agent.conf")
         if config_file.is_file():
-            with open(config_file) as fp:
+            with open("./config/agent.conf") as fp:
                 for line in fp:
                     print(line)
                     key = line.split('=')[0]
