@@ -11,7 +11,7 @@ node_info = {
 	"role" : "agent",
 	"myIP" : subprocess.getoutput("hostname -I | awk '{print $1}'"),
 	# "leaderIP" : '192.168.1.45',
-	"leaderIP" : '10.0.2.16',
+	"leaderIP" : '10.10.176.123',
 	"port" : 5000,
 	"IoT" : ["-", "semaforo", "rfid"], # necesario > 1 IoT para que api no lo transforme a string en lugar de lista
 	"broadcastIP" : subprocess.getoutput("ip a | grep inet | grep brd | awk '{print $4}'"),
