@@ -94,7 +94,8 @@ class RunTime:
             for key, value in params.items():
                 if value:
                     if(type(value) is dict):
-                        result += key + "=" + json.dumps(value) + " "
+                        json_dict = json.dumps(value).replace(" ","")
+                        result += key + "=" + json_dict + " "
                     elif(type(value) is list):
                         result += key + "="
                         for item in value:
