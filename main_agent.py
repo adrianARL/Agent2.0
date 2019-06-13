@@ -13,7 +13,14 @@ node_info = {
 	# "leaderIP" : '192.168.1.45',
 	"leaderIP" : '10.10.176.123',
 	"port" : 5000,
-	"IoT" : ["-", "semaforo", "rfid"], # necesario > 1 IoT para que api no lo transforme a string en lugar de lista
+
+	"IoT" : [
+		"-",
+		"ultrasonic_sensor",
+		"motor",
+		"line_sensor",
+		"rfid"
+	], # necesario > 1 IoT para que api no lo transforme a string en lugar de lista
 	"broadcastIP" : subprocess.getoutput("ip a | grep inet | grep brd | awk '{print $4}'"),
 	"cpu" : psutil.cpu_percent(),
 	"ram" : psutil.virtual_memory()[2],

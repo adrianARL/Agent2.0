@@ -92,8 +92,16 @@ class RunTime:
         result = ""
         if params:
             for key, value in params.items():
-                if value and value != "":
-                    result += key + "=" + str(value) + " "
+                if value:
+                    if(type(value) is dict):
+                        result += key + "=" + json.dumps(value) + " "
+                    elif(type(value) is list):
+                        result += key + "="
+                        for item in value:
+                            result+=item+"@"
+                        result += " "
+                    elif value != "":
+                        result += key + "=" + str(value) + " "
         return result
 
     def execute_code(self, python_version, code, params):
