@@ -127,7 +127,7 @@ class ServiceExecution:
             return False
 
     def find_agent_to_execute(self, service):
-        agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"]})
+        agents = self.agent.API.get_agents({"leaderID" : self.agent.node_info["nodeID"], "status": 1})
         if(agents):
             for agent in agents:
                 if(self.can_execute_service(service, agent)):
