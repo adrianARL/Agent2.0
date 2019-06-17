@@ -7,6 +7,11 @@ from threading import Thread
 
 class ServiceExecution:
 
+    UNATTENDED_MESSAGE = {
+        "type": "service_result",
+        "status": "unattended",
+    }
+
     def __init__(self, agent):
         self.agent = agent
         self.running_dependencies = {}
@@ -16,36 +21,63 @@ class ServiceExecution:
     def request_service(self, service):
         if self.agent.node_info["role"] == "agent":
             self.fill_service(service)
-            self.agent.API.request_service_to_leader(service)
+            service["agent_ip"] = self.agent.node_info["myIP"]
+            return self.agent.API.request_service_to_leader(service)
+        elif self.agent.node_info["role"] == "cloud_agent":
+            reg_service = self.agent.API.get_service(service)
+            self.fill_service(service, reg_service)
+            requester = self.get_service_requester(service)
+            if requester and requester["role"] == "agent":
+                leader = self.get_active_leader_from_agent(requester)
+                if leader:
+                    return self.agent.API.delegate_service(service, leader["myIP"])
+            else:
+                return self.agent.API.delegate_service(service, requester["myIP"])
+            return self.UNATTENDED_MESSAGE
         else:
             reg_service = self.agent.API.get_service(service)
             self.fill_service(service, reg_service)
-            if "dependencies" not in service.keys():
-                if self.requester_can_execute(service):
-                    self.agent.API.delegate_service(service, service["origin_ip"])
-                elif self.can_execute_service(service, self.agent.node_info):
-                    self.agent.API.delegate_service(service, self.agent.node_info["myIP"])
-                else:
-                    self.delegate_service(service)
+            if "dependencies" in service.keys():
+                for dependency in service.get("dependencies"):
+                    service_to_request = {"service_id": dependency, "agent_ip": service["agent_ip"]}
+                    service_to_request["params"] = service["params"] if "params" in service.keys else None
+                    result_dependency = self.agent.API.request_service_to_me(service_to_request)
+                    self.get_params_from_result(service, result_dependency)
+            if self.requester_can_execute(service):
+                return self.agent.API.delegate_service(service, service["agent_ip"])
+            elif self.can_execute_service(service, self.agent.node_info):
+                return self.agent.API.delegate_service(service, self.agent.node_info["myIP"])
             else:
-                self.running_dependencies[service["id"]] = []
-                self.pending_services[service["id"]] = service
-                services_to_delegate = []
-                for dependency in service["dependencies"]:
-                    service_to_delegate = {'params': service['params']}
-                    reg_dependency = self.agent.API.get_service({"service_id": dependency})
-                    self.fill_service(service_to_delegate, reg_dependency)
-                    self.running_dependencies[service["id"]].append(service_to_delegate["id"])
-                    self.dependency_of[service_to_delegate["id"]] = service["id"]
-                    services_to_delegate.append(service_to_delegate)
-                for service_to_delegate in services_to_delegate:
-                    if "dependencies" in service_to_delegate.keys():
-                        self.agent.API.delegate_service(service_to_delegate, self.agent.node_info["myIP"])
-                    else:
-                        if self.can_execute_service(service_to_delegate, self.agent.node_info):
-                            self.agent.API.delegate_service(service_to_delegate, self.agent.node_info["myIP"])
-                        else:
-                            self.delegate_service(service_to_delegate)
+                agent_ip = self.find_agent_to_execute(service)
+                if agent_ip:
+                    return self.agent.API.delegate_service(service, agent_ip)
+                else:
+                    return self.agent.API.delegate_service(service, self.agent.node_info["leaderIP"])
+
+
+    def get_service_requester(self, service):
+        if "agent_ip" in service:
+            agent_info = self.agent.API.get_agents({"myIP": service["agent_ip"], "status": 1})
+            if len(agent_info) > 0:
+                agent_info = agent_info[0]
+                return agent_info
+        return False
+
+    def get_active_leader_from_agent(self, requester):
+        if "agent_ip" in requester:
+            agent_info = self.agent.API.get_agents({"myIP": service["agent_ip"], "status": 1})
+            if len(agent_info) > 0:
+                agent_info = agent_info[0]
+                return agent_info
+        return False
+
+    def get_params_from_result(self, service, result):
+        if "status" in result.keys() and result["status"] == "success" and "output" in result.keys():
+            if "params" not in service.keys():
+                service["params"] = result["output"]
+            else:
+                for key, value in result["output"].items():
+                    service["params"][key] = value
 
     def attend_response(self, service_response):
         if service_response["id"] in self.dependency_of.keys():
@@ -118,8 +150,8 @@ class ServiceExecution:
 
 
     def requester_can_execute(self, service):
-        if "origin_ip" in service:
-            agent_info = self.agent.API.get_agents({"myIP": service["origin_ip"]})
+        if "agent_ip" in service:
+            agent_info = self.agent.API.get_agents({"myIP": service["agent_ip"], "status": 1})
             if len(agent_info) > 0:
                 agent_info = agent_info[0]
             return self.can_execute_service(service, agent_info)
@@ -166,19 +198,6 @@ class ServiceExecution:
 
     def fill_service(self, service, reg_service={}):
         random_id = str(self.agent.generate_service_id())
-        if "id" in service.keys():
-            service["origin_id"] = service["id"]
-        service["id"] = random_id
-
-        if "ip" in service.keys():
-            service["origin_ip"] = service["ip"]
-        service["ip"] = self.agent.node_info["myIP"]
-
-        # self.service_ids[random_id] = {
-        #     "origin_id": service["origin_id"],
-        #     "agent_id": service["agent_id"]
-        # }
-        self.agent.generated_services_id.append(random_id)
         for key in reg_service.keys():
             if key not in service.keys() and key != "params":
                 service[key] = reg_service[key]

@@ -1,7 +1,7 @@
 import cherrypy
 import pymongo
 import requests
-import pickle
+import json
 import logging
 import datetime
 
@@ -132,15 +132,15 @@ class API(object):
     def request_service(self, service):
         print("REQUEST_SERVICE:", service)
         logging.info("IN REQUEST_SERVICE: {}".format(service))
-        self.agent.service_execution.request_service(service)
+        return self.agent.service_execution.request_service(service)
 
     def execute_service(self, service):
         logging.info("IN EXECUTE_SERVICE: {}".format(service))
-        self.agent.runtime.execute_service(service)
+        return self.agent.runtime.execute_service(service)
 
     def response_service(self, service_result):
         logging.info("IN RESPONSE_SERVICE: {}".format(service_result))
-        self.agent.service_execution.attend_response(service_result)
+        return self.agent.service_execution.attend_response(service_result)
 
     def register_to_leader(self):
         if 'nodeID' not in self.agent.node_info:
@@ -165,13 +165,13 @@ class API(object):
     def delegate_service(self, service, agent_ip):
         logging.info("IN DELEGATE_SERVICE: {} - {}".format(agent_ip, service))
         try:
-            if agent_ip != self.agent.node_info["myIP"]:
-                self.agent.service_execution.pending_services[service["id"]] = service
-            # print("DELEGATE SERVICE: ", service)
-            status_code = requests.post("http://"+agent_ip+":8000/execute_service", json=service).status_code
+            response = requests.post("http://"+agent_ip+":8000/execute_service", json=service)
+            status_code = response.status_code
+            return json.loads(response.text)
         except Exception as e:
             print(e)
             status_code = -1
+            return
         if status_code != 200:
             print("No se ha podido delegar el servicio {} al agent".format(service["service_id"]))
         logging.info("OUT DELEGATE_SERVICE: code {}".format(status_code))
@@ -188,6 +188,21 @@ class API(object):
         if status_code != 200:
             print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
         logging.info("OUT REQUEST_SERVICE_TO_LEADER: code {}".format(status_code))
+
+    def request_service_to_me(self, service):
+        logging.info("IN REQUEST_SERVICE_TO_ME: {}".format(service))
+        try:
+            response = requests.post("http://"+self.agent.node_info["myIP"]+":8000/request_service", json=service)
+            status_code = response.status_code
+            return json.loads(response.text)
+        except Exception as e:
+            print(e)
+            status_code = -1
+            return
+        if status_code != 200:
+            print("No me he podido pedir el servicio")
+        logging.info("OUT REQUEST_SERVICE_TO_ME: code {}".format(status_code))
+
 
     def send_result(self, result, agent_ip):
         logging.info("IN SEND_RESULT: {} - {}".format(agent_ip, result))
@@ -213,7 +228,7 @@ class API(object):
     def return_data(self, data):
         result = ""
         if isinstance(data, dict):
-            result = pickle.dumps(dict)
+            result = json.dumps(data)
         elif isinstance(data, int):
             result = str(data)
         elif data is not None:

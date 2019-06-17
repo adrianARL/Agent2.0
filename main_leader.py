@@ -10,7 +10,7 @@ node_id = {
 	"device" : "Leader A",
 	"role" : "leader",
 	"myIP" : subprocess.getoutput("hostname -I | awk '{print $1}'"),
-	"leaderIP" : '10.10.176.123',
+	"leaderIP" : '10.1.136.179',
 	# "leaderIP" : '192.168.1.134',
 	"port" : 5000,
 	"IoT" : ["mapa", "semaforo"],

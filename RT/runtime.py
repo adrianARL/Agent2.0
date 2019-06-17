@@ -21,20 +21,20 @@ class RunTime:
         if not service["is_infinite"]:
             output = self.execute_code(service["python_version"], code, params)
             if self.check_error(output):
-                result = self.get_result(service["id"], output, "error")
+                result = self.get_result(output, "error")
                 if "ip" in service.keys():
                     self.agent.API.send_result(result, service["ip"])
                 else:
                     self.agent.API.send_result(result, self.agent.node_info["myIP"])
             else:
-                result = self.get_result(service["id"], output, "success")
+                result = self.get_result(output, "success")
                 if "ip" in service.keys():
                     self.agent.API.send_result(result, service["ip"])
                 else:
                     self.agent.API.send_result(result, self.agent.node_info["myIP"])
-        elif service["_id"] not in self.infinite_services:
+        elif service["service_id"] not in self.infinite_services:
             port = self.port
-            self.infinite_services[service["_id"]] = {
+            self.infinite_services[service["service_id"]] = {
                 "ip": self.agent.node_info["myIP"],
                 "port": port
             }
@@ -45,27 +45,26 @@ class RunTime:
                 "socket_port": port
             })
             time.sleep(2)
-            result = self.get_result(service["id"], output, "success")
+            result = self.get_result(output, "success")
             self.agent.API.send_result(result, service["ip"])
         else:
-            ip = self.infinite_services[service["_id"]]["ip"]
-            port = self.infinite_services[service["_id"]]["port"]
+            ip = self.infinite_services[service["service_id"]]["ip"]
+            port = self.infinite_services[service["service_id"]]["port"]
             output = json.dumps({
                 "socket_ip": self.agent.node_info["myIP"],
                 "socket_port": port
             })
-            result = self.get_result(service["id"], output, "success")
-            self.agent.API.send_result(result, service["ip"])
+            result = self.get_result(output, "success")
+            return result
 
     def add_socket_params(self, params):
         params += "ip=" + self.agent.node_info["myIP"] + " port=" + str(self.port)
         self.port += 2
         return params
 
-    def get_result(self, service_id, output, status):
+    def get_result(self, output, status):
         return {
             "type": "service_result",
-            "id": service_id,
             "status": status,
             "output": output
         }
