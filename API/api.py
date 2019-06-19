@@ -176,6 +176,17 @@ class API(object):
             print("No se ha podido delegar el servicio {} al agent".format(service["service_id"]))
         logging.info("OUT DELEGATE_SERVICE: code {}".format(status_code))
 
+    def request_service_to_agent(self, service, agent_ip):
+        logging.info("IN REQUEST_SERVICE_TO_LEADER: {}".format(service))
+
+        try:
+            status_code = requests.post("http://"+agent_ip+":8000/request_service", json=service).status_code
+        except Exception as e:
+            print(e)
+            status_code = -1
+        if status_code != 200:
+            print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
+        logging.info("OUT REQUEST_SERVICE_TO_LEADER: code {}".format(status_code))
 
     def request_service_to_leader(self, service):
         logging.info("IN REQUEST_SERVICE_TO_LEADER: {}".format(service))
