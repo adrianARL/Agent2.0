@@ -30,8 +30,8 @@ class ServiceExecution:
             if requester and requester["role"] == "agent":
                 leader = self.get_active_leader_from_agent(requester)
                 if leader:
-                    return self.agent.API.delegate_service(service, leader["myIP"])
-            else:
+                    return self.agent.API.request_service_to_agent(service, leader["myIP"])
+            elif requester:
                 return self.agent.API.delegate_service(service, requester["myIP"])
             return self.UNATTENDED_MESSAGE
         else:
@@ -40,7 +40,7 @@ class ServiceExecution:
             if "dependencies" in service.keys():
                 for dependency in service.get("dependencies"):
                     service_to_request = {"service_id": dependency, "agent_ip": service["agent_ip"]}
-                    service_to_request["params"] = service["params"] if "params" in service.keys else None
+                    service_to_request["params"] = service["params"] if "params" in service.keys() else None
                     result_dependency = self.agent.API.request_service_to_me(service_to_request)
                     self.get_params_from_result(service, result_dependency)
             if self.requester_can_execute(service):
@@ -64,8 +64,8 @@ class ServiceExecution:
         return False
 
     def get_active_leader_from_agent(self, requester):
-        if "agent_ip" in requester:
-            agent_info = self.agent.API.get_agents({"myIP": service["agent_ip"], "status": 1})
+        if "leaderIP" in requester:
+            agent_info = self.agent.API.get_agents({"myIP": requester["leaderIP"], "status": 1})
             if len(agent_info) > 0:
                 agent_info = agent_info[0]
                 return agent_info
