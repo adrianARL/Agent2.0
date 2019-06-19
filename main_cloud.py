@@ -6,7 +6,7 @@ from agent import Agent
 node_id = {
 	"ipDB" : "10.0.2.16",
 	# "ipDB" : "192.168.1.34",
-	"portDB" : 8000,
+	"portDB" : 8080,
 	"device" : "Agent",
 	"role" : "cloud_agent",
 	"myIP" : subprocess.getoutput("hostname -I | awk '{print $1}'"),
