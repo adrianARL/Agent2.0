@@ -73,6 +73,7 @@ class ServiceExecution:
 
     def get_params_from_result(self, service, result):
         if "status" in result.keys() and result["status"] == "success" and "output" in result.keys():
+            result["output"] = json.loads(result["output"])
             if "params" not in service.keys():
                 service["params"] = result["output"]
             else:

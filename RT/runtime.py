@@ -50,6 +50,7 @@ class RunTime:
                 "socket_port": port
             })
             result = self.get_result(output, "success")
+        print("HAGO RESULT DE", result)
         return result
 
     def add_socket_params(self, params):
