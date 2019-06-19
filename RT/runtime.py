@@ -18,20 +18,16 @@ class RunTime:
         params = self.prepare_params(service)
         self.get_code(code, service["params"])
         self.get_dependencies_codes(service.get("dependencies_codes"), service["params"])
+        result = {
+            "type": "service_result",
+            "status": "unattended",
+        }
         if not service["is_infinite"]:
             output = self.execute_code(service["python_version"], code, params)
             if self.check_error(output):
                 result = self.get_result(output, "error")
-                if "ip" in service.keys():
-                    self.agent.API.send_result(result, service["ip"])
-                else:
-                    self.agent.API.send_result(result, self.agent.node_info["myIP"])
             else:
                 result = self.get_result(output, "success")
-                if "ip" in service.keys():
-                    self.agent.API.send_result(result, service["ip"])
-                else:
-                    self.agent.API.send_result(result, self.agent.node_info["myIP"])
         elif service["service_id"] not in self.infinite_services:
             port = self.port
             self.infinite_services[service["service_id"]] = {
@@ -46,7 +42,6 @@ class RunTime:
             })
             time.sleep(2)
             result = self.get_result(output, "success")
-            self.agent.API.send_result(result, service["ip"])
         else:
             ip = self.infinite_services[service["service_id"]]["ip"]
             port = self.infinite_services[service["service_id"]]["port"]
@@ -55,7 +50,7 @@ class RunTime:
                 "socket_port": port
             })
             result = self.get_result(output, "success")
-            return result
+        return result
 
     def add_socket_params(self, params):
         params += "ip=" + self.agent.node_info["myIP"] + " port=" + str(self.port)
