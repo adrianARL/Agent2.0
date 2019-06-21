@@ -155,7 +155,7 @@ class API(object):
                     status_code = 200
             if status_code == 200:
                 file = open("./config/agent.conf", "w")
-                file.write("nodeID={}".format(self.agent.node_info["nodeID"]))
+                json.dump({"nodeID": self.agent.node_info["nodeID"]}, file) 
                 file.close()
                 logging.info("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
                 print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
