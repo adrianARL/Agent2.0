@@ -49,13 +49,8 @@ class RunTime:
             socket_ip = service["service_id"]+"_ip"
             socket_port = service["service_id"]+"_port"
             output = json.dumps({
-<<<<<<< HEAD
                 socket_ip: self.agent.node_info["myIP"],
                 socket_port: port
-=======
-                "{}_ip".format(service["service_id"]): self.agent.node_info["myIP"],
-                "{}_port".format(service["service_id"]): port
->>>>>>> 77758eadac2ebe4a6afe1d1318d8ba6484b24317
             })
             result = self.get_result(output, "success")
         print("HAGO RESULT DE", result)
