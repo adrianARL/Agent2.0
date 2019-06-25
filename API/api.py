@@ -155,7 +155,7 @@ class API(object):
                     status_code = 200
             if status_code == 200:
                 file = open("./config/agent.conf", "w")
-                json.dump({"nodeID": self.agent.node_info["nodeID"]}, file) 
+                json.dump({"nodeID": self.agent.node_info["nodeID"]}, file)
                 file.close()
                 logging.info("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
                 print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
@@ -167,20 +167,21 @@ class API(object):
         try:
             response = requests.post("http://"+agent_ip+":8000/execute_service", json=service)
             status_code = response.status_code
+            print("RESPONSE: ", response.text)
             return json.loads(response.text)
         except Exception as e:
             print(e)
             status_code = -1
-            return
         if status_code != 200:
             print("No se ha podido delegar el servicio {} al agent".format(service["service_id"]))
         logging.info("OUT DELEGATE_SERVICE: code {}".format(status_code))
 
     def request_service_to_agent(self, service, agent_ip):
         logging.info("IN REQUEST_SERVICE_TO_LEADER: {}".format(service))
-
         try:
-            status_code = requests.post("http://"+agent_ip+":8000/request_service", json=service).status_code
+            response = requests.post("http://"+agent_ip+":8000/request_service", json=service)
+            status_code = response.status_code
+            return json.loads(response.text)
         except Exception as e:
             print(e)
             status_code = -1
@@ -192,7 +193,9 @@ class API(object):
         logging.info("IN REQUEST_SERVICE_TO_LEADER: {}".format(service))
 
         try:
-            status_code = requests.post(self.leader_url+"/request_service", json=service).status_code
+            response = requests.post(self.leader_url+"/request_service", json=service)
+            status_code = response.status_code
+            return json.loads(response.text)
         except Exception as e:
             print(e)
             status_code = -1
@@ -215,16 +218,6 @@ class API(object):
         logging.info("OUT REQUEST_SERVICE_TO_ME: code {}".format(status_code))
 
 
-    def send_result(self, result, agent_ip):
-        logging.info("IN SEND_RESULT: {} - {}".format(agent_ip, result))
-        status_code = -1
-        try:
-            print("RESULT", result)
-            status_code = requests.post("http://"+agent_ip+":8000/response_service", json=result)
-        except Exception as e:
-            print(e)
-        logging.info("OUT SEND_RESULT: code {}".format(status_code))
-
     def register_cloud_agent(self):
         body = self.agent.node_info
         try:
@@ -244,6 +237,7 @@ class API(object):
             result = str(data)
         elif data is not None:
             result = data
+        print(type(data),result)
         return result.encode()
 
     def check_alive(self, agent_ip):
