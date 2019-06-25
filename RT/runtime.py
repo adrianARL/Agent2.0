@@ -36,18 +36,21 @@ class RunTime:
             }
             params = self.add_socket_params(params)
             Thread(target=self.execute_code, args=(service["python_version"], code, params)).start()
+            socket_ip = service["service_id"]+"_ip"
+            socket_port = service["service_id"]+"_port"
             output = json.dumps({
-                "socket_ip": self.agent.node_info["myIP"],
-                "socket_port": port
+                socket_ip: self.agent.node_info["myIP"],
+                socket_port: port
             })
             time.sleep(2)
             result = self.get_result(output, "success")
         else:
-            ip = self.infinite_services[service["service_id"]]["ip"]
             port = self.infinite_services[service["service_id"]]["port"]
+            socket_ip = service["service_id"]+"_ip"
+            socket_port = service["service_id"]+"_port"
             output = json.dumps({
-                "socket_ip": self.agent.node_info["myIP"],
-                "socket_port": port
+                socket_ip: self.agent.node_info["myIP"],
+                socket_port: port
             })
             result = self.get_result(output, "success")
         print("HAGO RESULT DE", result)
