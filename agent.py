@@ -1,6 +1,7 @@
 import socket
 import pickle
 import uuid
+import json
 from pathlib import Path
 from threading import Thread
 from TRM.topology_manager import TopologyManager
@@ -42,13 +43,9 @@ class Agent:
         config_file = Path("./config/agent.conf")
         if config_file.is_file():
             with open("./config/agent.conf") as fp:
-                for line in fp:
-                    print(line)
-                    key = line.split('=')[0]
-                    value = line.split('=')[1].strip()
+                content = json.load(fp)
+                for key, value in content.items():
                     self.node_info[key] = value
-
-
 
 ######################### TRM OPERATIONS ##########################
 

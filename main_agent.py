@@ -19,8 +19,9 @@ node_info = {
 		"ultrasonic_sensor",
 		"motor",
 		"line_sensor",
-		"rfid"
-	], # necesario > 1 IoT para que api no lo transforme a string en lugar de lista
+		"rfid_sensor",
+		"wheels"
+	],
 	"broadcastIP" : subprocess.getoutput("ip a | grep inet | grep brd | awk '{print $4}'"),
 	"cpu" : psutil.cpu_percent(),
 	"ram" : psutil.virtual_memory()[2],
