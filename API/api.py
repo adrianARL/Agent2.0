@@ -167,7 +167,6 @@ class API(object):
         try:
             response = requests.post("http://"+agent_ip+":8000/execute_service", json=service)
             status_code = response.status_code
-            print("RESPONSE: ", response.text)
             return json.loads(response.text)
         except Exception as e:
             print(e)
@@ -237,7 +236,6 @@ class API(object):
             result = str(data)
         elif data is not None:
             result = data
-        print(type(data),result)
         return result.encode()
 
     def check_alive(self, agent_ip):
