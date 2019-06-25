@@ -46,8 +46,8 @@ class RunTime:
             ip = self.infinite_services[service["service_id"]]["ip"]
             port = self.infinite_services[service["service_id"]]["port"]
             output = json.dumps({
-                "socket_ip": self.agent.node_info["myIP"],
-                "socket_port": port
+                "{}_ip".format(service["service_id"]): self.agent.node_info["myIP"],
+                "{}_port".format(service["service_id"]): port
             })
             result = self.get_result(output, "success")
         print("HAGO RESULT DE", result)
