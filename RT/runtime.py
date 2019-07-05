@@ -42,10 +42,10 @@ class RunTime:
                 socket_ip: self.agent.node_info["myIP"],
                 socket_port: port
             })
-            time.sleep(2)
+            time.sleep(3)
             result = self.get_result(output, "success")
         else:
-            port = self.infinite_services[service["service_id"]]["port"] 
+            port = self.infinite_services[service["service_id"]]["port"]
             socket_ip = service["service_id"]+"_ip"
             socket_port = service["service_id"]+"_port"
             output = json.dumps({
