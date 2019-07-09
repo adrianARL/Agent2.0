@@ -32,13 +32,6 @@ class Agent:
         self.API.start()
 
 
-
-    def __del__(self):
-        print("termino")
-        self.node_info["status"] = 0
-        self.update_DB_info()
-
-
     def get_attributes(self):
         config_file = Path("./config/agent.conf")
         if config_file.is_file():
