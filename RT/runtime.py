@@ -42,7 +42,6 @@ class RunTime:
                 socket_ip: self.agent.node_info["myIP"],
                 socket_port: port
             })
-            time.sleep(3)
             result = self.get_result(output, "success")
         else:
             port = self.infinite_services[service["service_id"]]["port"]
