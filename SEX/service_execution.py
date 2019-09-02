@@ -29,8 +29,15 @@ class ServiceExecution:
             requester = self.get_service_requester(service)
             if requester and requester["role"] == "agent":
                 leader = self.get_active_leader_from_agent(requester)
-                if leader:
+                if self.can_execute_service(service, leader) or self.can_execute_service(service, requester):
                     return self.agent.API.request_service_to_agent(service, leader["myIP"])
+                else:
+                    agent_to_delegate = self.find_agent_to_delegate(service)
+                    if agent_to_delegate:
+                        if agent_to_delegate.get("leaderID") == self.agent.node_info["nodeID"]:
+                            return self.agent.API.delegate_service(service, agent_to_delegate["myIP"])
+                        elif agent_to_delegate.get("leaderID"):
+                            return self.agent.API.request_service_to_agent(service, agent_to_delegate.get("leaderID"))
             elif requester:
                 return self.agent.API.delegate_service(service, requester["myIP"])
             return self.UNATTENDED_MESSAGE
@@ -165,6 +172,14 @@ class ServiceExecution:
             for agent in agents:
                 if(self.can_execute_service(service, agent)):
                     return  agent["myIP"]
+        return None
+
+    def find_agent_to_delegate(self, service):
+        agents = self.agent.API.get_agents({"status": 1})
+        if(agents):
+            for agent in agents:
+                if(self.can_execute_service(service, agent)):
+                    return  agent
         return None
 
     def attend_service_dependencies(self, service):
