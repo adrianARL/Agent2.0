@@ -52,7 +52,7 @@ class ServiceExecution:
                 if agent_ip:
                     return self.agent.API.delegate_service(service, agent_ip)
                 else:
-                    return self.agent.API.delegate_service(service, self.agent.node_info["leaderIP"])
+                    return self.agent.API.request_service_to_leader(service, self.agent.node_info["leaderIP"])
 
 
     def get_service_requester(self, service):
