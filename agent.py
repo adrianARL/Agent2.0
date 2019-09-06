@@ -24,12 +24,12 @@ class Agent:
         self.topology_manager = None
         self.API = API(self, host=self.node_info["myIP"])
         self.get_attributes()
-        if self.node_info["role"] != "cloud_agent":
-            self.API.register_to_leader()
-        else:
-            self.API.register_cloud_agent()
+        # if self.node_info["role"] != "cloud_agent":
+        #     self.API.register_to_leader()
+        # else:
+        #     self.API.register_cloud_agent()
         self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
-        self.API.start()
+        self.API.start(silent_access=False)
 
 
     def get_attributes(self):
