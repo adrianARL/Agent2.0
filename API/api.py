@@ -22,9 +22,9 @@ class API(object):
 
     def GET(self, obj=None, id=None):
         if obj == "agent":
-            self.get_agents(id)
+            return self.return_data(self.get_agents(id))
         elif obj == "service":
-            self.get_service(id)
+            return self.return_data(self.get_service(id))
         elif obj == "alive":
             return "Alive".encode()
 
@@ -121,13 +121,19 @@ class API(object):
         logging.info("Entro a get_service con {}".format(input))
         if input:
             # obtener un servicio
-            selec = {"_id": input["service_id"]}
-            service = self.service_catalog.find_one(selec);
-            logging.info("Salgo de get_agents con {}".format(service))
+            if type(input) is str:
+                print("entro con {}".format(input))
+                service = self.service_catalog.find_one(input)
+                print("salgo con {}".format(service))
+            else:
+                selec = {"_id": input["service_id"]}
+                service = self.service_catalog.find_one(selec);
+                logging.info("Salgo de get_agents con {}".format(service))
             return service
         else:
             # obtener todos los servicios
-            return None
+            services = self.service_catalog.find();
+            return list(services)
 
     def request_service(self, service):
         print("REQUEST_SERVICE:", service)
@@ -233,6 +239,8 @@ class API(object):
         if isinstance(data, dict):
             result = json.dumps(data)
         elif isinstance(data, int):
+            result = str(data)
+        elif isinstance(data, list):
             result = str(data)
         elif data is not None:
             result = data

@@ -39,7 +39,7 @@ class ServiceExecution:
                         elif agent_to_delegate.get("leaderID"):
                             return self.agent.API.request_service_to_agent(service, agent_to_delegate.get("leaderID"))
             elif requester:
-                return self.agent.API.delegate_service(service, requester["myIP"])
+                return self.agent.API.request_service_to_agent(service, requester["myIP"])
             return self.UNATTENDED_MESSAGE
         else:
             reg_service = self.agent.API.get_service(service)
