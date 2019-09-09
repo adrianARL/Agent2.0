@@ -91,36 +91,57 @@ def get_services():
 	services = requests.get("http://{}:8000/service".format(leader_ip)).text
 	services = convert_to_list(services)
 	services = filter_services(services)
-	print(services)
 	return services	
 
 def request_service(service):
-	requests.post("http://{}:8000/request_service".format(my_ip), json=service)
+	result = requests.post("http://{}:8000/request_service".format(my_ip), json=service)
+	return result
+
+def find_service(services, service_id):
+	for service in services:
+		if service["_id"] == service_id:
+			return service
+
+def generate_service_list(services):
+	services_list = []
+	for service in services:
+		services_list.append(service["_id"])
+
+	return services_list
 
 def main():
 	register_to_leader()
-	get_services()
-	# os.system("clear")
-	# services = {"Servicio 1": {"params": ["parametro1", "parametro2"]}, "Servicio 2": "", "Servicio 3":"", "Servicio 4":"", "Exit":""}
-	# services_list = [service for service in services.keys()]
-	# while True:
-	# 	title = "Elige un servicio a solicitar:"
-	# 	service, index = pick(services_list, title, indicator="=>")
-	# 	print("Has seleccionado: {}".format(service))
-	# 	request = {}
-	# 	if service != "Exit":
-	# 		request["service_id"] = service
-	# 		request["params"] = {}
-	# 		params = services[service]["params"]
-	# 		for param in params:
-	# 			value = input("{}: ".format(param))
-	# 			request["params"][param] = value
-	# 		input("Pulsa ENTER para solicitar el servicio {}".format(service))
-	# 		request_service(request)
-	# 	else:
-	# 		os.system("clear")
-	# 		print("Has salido del programa")
-	# 		break
+	services = get_services()
+	services_list = generate_service_list(services)
+	print(services)
+	print()
+	print(services_list)
+	os.system("clear")
+	while True:
+		title = "Elige un servicio a solicitar:"
+		service_id, index = pick(services_list, title, indicator="=>")
+		request = {}
+		if service_id != "Exit":
+			service = find_service(services, service_id)
+			request["service_id"] = service_id
+			request["params"] = {}
+			if service.get("params"):
+				os.system("clear")
+				print("Servicio: {}".format(service_id))
+				print("Introduce los parametros del servicio: ")
+				params = service["params"]
+				request["params"] = params
+				for param in params:
+					value = input("\t{}: ".format(param))
+					request["params"][param] = value
+			input("\nPulsa ENTER para solicitar el servicio {}".format(service_id))
+			result = request_service(request)
+			print("Resultado del servicio: {}".format(result))
+			input("Presiona ENTER para solicitar otro servicio")
+		else:
+			os.system("clear")
+			print("Has salido del programa")
+			break
 
 
 if __name__ == '__main__':
