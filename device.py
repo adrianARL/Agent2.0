@@ -14,9 +14,8 @@ node_info = {}
 
 def register_to_leader():
 	global leader_ip, node_info
-	if not os.path.exists("device.config"):
+	if not os.path.exists("./config/device.config"):
 		leader_ip = input("Leader IP: ")
-		config = open("device.config", "w")
 		content = {}
 		content["leader_ip"] = leader_ip
 		node_info = {
@@ -44,14 +43,18 @@ def register_to_leader():
 				node_info["IoT"] = iots
 			else:
 				value = input("{}: ".format(attribute))
-				node_info[attribute] = value	
-		node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
-		node_info["nodeID"] = node_id.text.zfill(10)
-		content["node_info"] = node_info
-		json.dump(content, config)
-		config.close()
+				node_info[attribute] = value
+		try:	
+			node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
+			node_info["nodeID"] = node_id.text.zfill(10)
+			content["node_info"] = node_info
+			config = open("./config/device.config", "w")
+			json.dump(content, config)
+			config.close()
+		except:
+			print("ERROR: No se ha podido conectar con el leader {}. Intentalo mas tarde.".format(leader_ip))
 	else:
-		config = open("device.config", "r")
+		config = open("./config/device.config", "r")
 		content = json.load(config)
 		leader_ip = content["leader_ip"]
 		node_info = content["node_info"]
