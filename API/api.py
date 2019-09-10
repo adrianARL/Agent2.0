@@ -14,9 +14,10 @@ class API(object):
         self.host = host
         self.port = port
         self.leader_url = "http://{}:8000".format(self.agent.node_info['leaderIP'])
-        client = pymongo.MongoClient(self.agent.node_info["ipDB"], self.agent.node_info["portDB"])
-        self.agent_collection = client.globalDB.nodes
-        self.service_catalog = client.globalDB.service_catalog
+        if(self.agent.node_info["role"] != "agent"):
+            client = pymongo.MongoClient(self.agent.node_info["ipDB"], self.agent.node_info["portDB"])
+            self.agent_collection = client.globalDB.nodes
+            self.service_catalog = client.globalDB.service_catalog
         today = datetime.date.today()
         logging.basicConfig(filename='logs/{:%d%m%Y}.log'.format(today), filemode='w', format='%(process)d-%(levelname)s-%(message)s')
 
