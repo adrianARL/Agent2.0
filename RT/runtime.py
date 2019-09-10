@@ -16,7 +16,7 @@ class RunTime:
     def execute_service(self, service):
         code = service["code"]
         params = self.prepare_params(service)
-        self.get_code(code, service["params"])
+        self.get_code(code, service)
         self.get_dependencies_codes(service.get("dependencies_codes"), service["params"])
         result = {
             "type": "service_result",
@@ -74,9 +74,9 @@ class RunTime:
         except:
             return False
 
-    def get_code(self, code, params):
+    def get_code(self, code, service):
         if not self.has_service_code(code):
-            self.get_remote_file(code, params)
+            self.get_remote_file(code, service)
 
     def get_dependencies_codes(self, codes, params):
         if codes:
@@ -112,9 +112,9 @@ class RunTime:
             output = subprocess.getoutput(python_version + " ./codes/" + code)
         return output
 
-    def get_remote_file(self, code, params):
+    def get_remote_file(self, code, service):
         file = open("./codes/" + code, 'wb')
-        content = requests.get("http://{}:{}/download/{}".format(params["host_frontend"], params["port_frontend"], code)).content
+        content = requests.get("http://{}:{}/download/{}".format(service["download_host"], service["download_port"], code)).content
         file.write(content)
         file.close()
 

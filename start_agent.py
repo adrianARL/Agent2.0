@@ -9,11 +9,9 @@ if os.path.exists("./config/device.config"):
 	content = json.load(config)
 	node_info = content["node_info"]
 
-	print(node_info)
-	
 	if node_info["role"] == "agent":
 		agent = Agent(node_info)
-	else if node_info["role"] == "leader" or node_info["role"] == "cloud_agent":
+	elif node_info["role"] == "leader" or node_info["role"] == "cloud_agent":
 		leader = Leader(node_info)
 	
 	while True:

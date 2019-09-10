@@ -94,6 +94,7 @@ def get_services():
 
 def request_service(service):
 	result = requests.post("http://{}:8000/request_service".format(my_ip), json=service)
+	print("Antes de devolver el resultado")
 	return result
 
 def find_service(services, service_id):
@@ -137,6 +138,7 @@ def main():
 			result = request_service(request)
 			print("Resultado del servicio: {}".format(result))
 			input("Presiona ENTER para solicitar otro servicio")
+			os.system("clear")
 		else:
 			os.system("clear")
 			print("Has salido del programa")
