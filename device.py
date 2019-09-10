@@ -20,9 +20,7 @@ def register_to_leader():
 		content["leader_ip"] = leader_ip
 		node_info = {
 	        "ipDB" : "10.0.2.16",
-	        "portDB" : 8080,
-	        "device" : "Agent",
-	        "role" : "agent",
+	        "portDB" : 27017,
 	        "myIP" : my_ip,
 	        "leaderIP" : leader_ip,
 	        "port" : 5000,
@@ -58,6 +56,7 @@ def register_to_leader():
 		content = json.load(config)
 		leader_ip = content["leader_ip"]
 		node_info = content["node_info"]
+		config.close()
 	# subprocess.call("python3 start_agent.py &", shell=True)
 
 def filter_services(services):

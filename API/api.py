@@ -14,7 +14,7 @@ class API(object):
         self.host = host
         self.port = port
         self.leader_url = "http://{}:8000".format(self.agent.node_info['leaderIP'])
-        if(self.agent.node_info["role"] != "agent"):
+        if self.agent.node_info["role"] != "agent":
             client = pymongo.MongoClient(self.agent.node_info["ipDB"], self.agent.node_info["portDB"])
             self.agent_collection = client.globalDB.nodes
             self.service_catalog = client.globalDB.service_catalog
