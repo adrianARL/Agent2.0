@@ -17,7 +17,7 @@ class RunTime:
         code = service["code"]
         params = self.prepare_params(service)
         self.get_code(code, service)
-        self.get_dependencies_codes(service.get("dependencies_codes"), service["params"])
+        self.get_dependencies_codes(service.get("dependencies_codes"), service)
         result = {
             "type": "service_result",
             "status": "unattended",
@@ -78,10 +78,10 @@ class RunTime:
         if not self.has_service_code(code):
             self.get_remote_file(code, service)
 
-    def get_dependencies_codes(self, codes, params):
+    def get_dependencies_codes(self, codes, service):
         if codes:
             for code in codes.split(" "):
-                self.get_code(code, params)
+                self.get_code(code, service)
 
     def prepare_params(self, service):
         params = service.get("params")
