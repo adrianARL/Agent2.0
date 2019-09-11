@@ -45,7 +45,7 @@ class Leader(Agent):
             agent_id = str(self.generate_id())
             self.agents[agent_id] = agent_connection
             self.agents[agent_id].setblocking(0)
-            print("Nuevo agent con id " + agent_id)
+            #print("Nuevo agent con id " + agent_id)
 
     def accept_alive_connections(self):
         while True:
@@ -66,11 +66,11 @@ class Leader(Agent):
                 except IOError as e:
                     if e.errno == errno.EPIPE:
                         if agent_id in self.agents.keys() and agent_id in self.agents_alive.keys():
-                            print("He detectado que el agent {} esta desconectado".format(agent_id))
+                            #print("He detectado que el agent {} esta desconectado".format(agent_id))
                             self.agents.pop(agent_id)
                             self.agents_alive.pop(agent_id)
                             self.topology_manager.update({'nodeID': agent_id, 'status': 0})
-                            print("He hecho update de {} a status 0".format(agent_id))
+                            #print("He hecho update de {} a status 0".format(agent_id))
                 except:
                     pass
 
@@ -105,17 +105,17 @@ class Leader(Agent):
 
     def process_dict(self, dict, agent_id):
         if dict["type"] == "register":
-            # print("Entro en register")
+            # #print("Entro en register")
             new_id = dict["id"]
             self.agents[new_id] = self.agents[agent_id]
             del self.agents[agent_id]
             self.topology_manager.update({'nodeID': new_id, 'zone': self.node_info['zone']})
-            # print("He hecho update")
+            # #print("He hecho update")
         elif dict["type"] == "service":
-            # print("He recibido el servicio {}".format(dict.items()))
+            # #print("He recibido el servicio {}".format(dict.items()))
             self.services.append(dict)
         elif dict["type"] == "service_result":
-            print("Resultado: ", dict.get("output"))
+            #print("Resultado: ", dict.get("output"))
             self.services_results.append(dict)
 
     def send_dict_to(self, dict, agent_id):

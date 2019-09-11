@@ -52,7 +52,7 @@ class RunTime:
                 socket_port: port
             })
             result = self.get_result(output, "success")
-        print("HAGO RESULT DE", result)
+        ##print("HAGO RESULT DE", result)
         return result
 
     def add_socket_params(self, params):
@@ -85,7 +85,7 @@ class RunTime:
 
     def prepare_params(self, service):
         params = service.get("params")
-        print("PARAMS:", params)
+        ##print("PARAMS:", params)
         result = ""
         if params:
             for key, value in params.items():
@@ -102,13 +102,13 @@ class RunTime:
         return result
 
     def execute_code(self, python_version, code, params):
-        print("Voy a ejecutar:\n{}\n{}\n{}".format(python_version, code, params))
+        ##print("Voy a ejecutar:\n{}\n{}\n{}".format(python_version, code, params))
         if params:
-            print("HAY PARAMS")
+            ##print("HAY PARAMS")
             output = subprocess.getoutput(python_version + " ./codes/" + code + " " + params)
             # dentro del code.py que se ejecuta para obtener params: params = sys.argv[1].split(" ")
         else:
-            print("NO HAY PARAMS")
+            ##print("NO HAY PARAMS")
             output = subprocess.getoutput(python_version + " ./codes/" + code)
         return output
 

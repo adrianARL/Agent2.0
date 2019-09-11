@@ -105,7 +105,8 @@ class API(object):
                 logging.info("Salgo de get_agents con {}".format(agent_list))
                 return agent_list
             except Exception as e:
-                print(e)
+                pass
+                #print(e)
 
     def delete_agent(self, selec):
         self.agent_collection.delete_one(selec)
@@ -123,9 +124,9 @@ class API(object):
         if input:
             # obtener un servicio
             if type(input) is str:
-                print("entro con {}".format(input))
+                #print("entro con {}".format(input))
                 service = self.service_catalog.find_one(input)
-                print("salgo con {}".format(service))
+                #print("salgo con {}".format(service))
             else:
                 selec = {"_id": input["service_id"]}
                 service = self.service_catalog.find_one(selec);
@@ -137,7 +138,7 @@ class API(object):
             return list(services)
 
     def request_service(self, service):
-        print("REQUEST_SERVICE:", service)
+        #print("REQUEST_SERVICE:", service)
         logging.info("IN REQUEST_SERVICE: {}".format(service))
         return self.agent.service_execution.request_service(service)
 
@@ -165,9 +166,10 @@ class API(object):
                 json.dump({"nodeID": self.agent.node_info["nodeID"]}, file)
                 file.close()
                 logging.info("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
-                print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
+                #print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
             else:
-                print("No se ha podido registrar el agent")
+                pass
+                #print("No se ha podido registrar el agent")
 
     def delegate_service(self, service, agent_ip):
         logging.info("IN DELEGATE_SERVICE: {} - {}".format(agent_ip, service))
@@ -176,10 +178,11 @@ class API(object):
             status_code = response.status_code
             return json.loads(response.text)
         except Exception as e:
-            print(e)
+            #print(e)
             status_code = -1
         if status_code != 200:
-            print("No se ha podido delegar el servicio {} al agent".format(service["service_id"]))
+            pass
+            #print("No se ha podido delegar el servicio {} al agent".format(service["service_id"]))
         logging.info("OUT DELEGATE_SERVICE: code {}".format(status_code))
 
     def request_service_to_agent(self, service, agent_ip):
@@ -189,10 +192,11 @@ class API(object):
             status_code = response.status_code
             return json.loads(response.text)
         except Exception as e:
-            print(e)
+            #print(e)
             status_code = -1
         if status_code != 200:
-            print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
+            pass
+            #print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
         logging.info("OUT REQUEST_SERVICE_TO_LEADER: code {}".format(status_code))
 
     def request_service_to_leader(self, service):
@@ -203,10 +207,11 @@ class API(object):
             status_code = response.status_code
             return json.loads(response.text)
         except Exception as e:
-            print(e)
+            #print(e)
             status_code = -1
         if status_code != 200:
-            print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
+            pass
+            #print("No se ha podido pedir el servicio {} al leader".format(service["service_id"]))
         logging.info("OUT REQUEST_SERVICE_TO_LEADER: code {}".format(status_code))
 
     def request_service_to_me(self, service):
@@ -216,11 +221,12 @@ class API(object):
             status_code = response.status_code
             return json.loads(response.text)
         except Exception as e:
-            print(e)
+            #print(e)
             status_code = -1
             return
         if status_code != 200:
-            print("No me he podido pedir el servicio")
+            pass
+            #print("No me he podido pedir el servicio")
         logging.info("OUT REQUEST_SERVICE_TO_ME: code {}".format(status_code))
 
 
@@ -233,7 +239,8 @@ class API(object):
         except pymongo.errors.DuplicateKeyError as e:
             pass
         except Exception as e:
-            print(e)
+            pass
+            #print(e)
 
     def return_data(self, data):
         result = ""
