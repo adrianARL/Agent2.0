@@ -57,7 +57,13 @@ def register_to_leader():
 		leader_ip = content["leader_ip"]
 		node_info = content["node_info"]
 		config.close()
-	subprocess.call("python3 start_agent.py &", shell=True)
+	start_agent()
+
+def start_agent():
+	try:
+		requests.get("http://{}:8000/alive".format(my_ip))
+	except:
+		subprocess.call("python3 start_agent.py &", shell=True)
 
 def filter_services(services):
 	global node_info
