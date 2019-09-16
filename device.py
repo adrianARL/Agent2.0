@@ -57,7 +57,13 @@ def register_to_leader():
 		leader_ip = content["leader_ip"]
 		node_info = content["node_info"]
 		config.close()
-	# subprocess.call("python3 start_agent.py &", shell=True)
+	start_agent()
+
+def start_agent():
+	try:
+		requests.get("http://{}:8000/alive".format(my_ip))
+	except:
+		subprocess.call("python3 start_agent.py &", shell=True)
 
 def filter_services(services):
 	global node_info
@@ -93,8 +99,7 @@ def get_services():
 	return services	
 
 def request_service(service):
-	result = requests.post("http://{}:8000/request_service".format(my_ip), json=service)
-	print("Antes de devolver el resultado")
+	result = requests.post("http://{}:8000/request_service".format(my_ip), json=service).text
 	return result
 
 def find_service(services, service_id):
@@ -113,15 +118,13 @@ def main():
 	register_to_leader()
 	services = get_services()
 	services_list = generate_service_list(services)
-	print(services)
-	print()
-	print(services_list)
+	services_list.append("EXIT")
 	os.system("clear")
 	while True:
 		title = "Elige un servicio a solicitar:"
 		service_id, index = pick(services_list, title, indicator="=>")
 		request = {}
-		if service_id != "Exit":
+		if service_id != "EXIT":
 			service = find_service(services, service_id)
 			request["service_id"] = service_id
 			request["params"] = {}
@@ -134,10 +137,10 @@ def main():
 				for param in params:
 					value = input("\t{}: ".format(param))
 					request["params"][param] = value
-			input("\nPulsa ENTER para solicitar el servicio {}".format(service_id))
+				input("\nPulsa ENTER para solicitar el servicio {}".format(service_id))
 			result = request_service(request)
-			print("Resultado del servicio: {}".format(result))
-			input("Presiona ENTER para solicitar otro servicio")
+			print("\nResultado del servicio: {}".format(result))
+			input("\nPresiona ENTER para solicitar otro servicio")
 			os.system("clear")
 		else:
 			os.system("clear")

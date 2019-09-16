@@ -113,17 +113,20 @@ class ServiceExecution:
                 if "origin_ip" in service_pending.keys():
                     self.agent.API.send_result(service_response, service_pending["origin_ip"])
                 else:
-                    print("MENSAJE FINAL = {}".format(service_response))
+                    pass
+                    #print("MENSAJE FINAL = {}".format(service_response))
                 del self.pending_services[service_response["id"]]
         elif service_response.get("id") and self.pending_services.get(service_response.get("id")):
             service_pending = self.pending_services[service_response["id"]]
             if "origin_ip" in service_pending.keys():
                 self.agent.API.send_result(service_response, service_pending["origin_ip"])
             else:
-                print("MENSAJE FINAL = {}".format(service_response))
+                pass
+                #print("MENSAJE FINAL = {}".format(service_response))
             del self.pending_services[service_response["id"]]
         else:
-            print("MENSAJE FINAL = {}".format(service_response))
+            pass
+            #print("MENSAJE FINAL = {}".format(service_response))
 
 
 

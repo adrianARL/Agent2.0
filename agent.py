@@ -29,7 +29,7 @@ class Agent:
         # else:
         #     self.API.register_cloud_agent()
         self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
-        self.API.start(silent_access=False)
+        self.API.start(silent_access=True)
 
 
     def get_attributes(self):
@@ -45,27 +45,32 @@ class Agent:
     def register_to_DB(self):
         status, id = self.topology_manager.register(self.node_info)
         if status == 200:
-            print("Registrado en la base de datos con id {}".format(id))
+            #print("Registrado en la base de datos con id {}".format(id))
             self.node_info['nodeID'] = id.zfill(10)
         else:
-            print("El agent no se ha registrado en la base de datos")
+            pass
+            #print("El agent no se ha registrado en la base de datos")
 
 
     def update_DB_info(self):
         updated = self.topology_manager.update(self.node_info)
         if updated != 200:
-            print("El nodo {} no se ha podido actualizar".format(self.node_info['myIP']))
+            pass
+            #print("El nodo {} no se ha podido actualizar".format(self.node_info['myIP']))
         else:
-            print("El nodo {} se ha actualizado correctamente".format(self.node_info['myIP']))
+            pass
+            #print("El nodo {} se ha actualizado correctamente".format(self.node_info['myIP']))
 
 
 
     def remove_from_DB(self):
         deleted = self.topology_manager.delete(self.node_info['myIP'])
         if deleted != 200:
-            print("El nodo {} no se ha podido borrar de la base de datos".format(self.node_info['myIP']))
+            pass
+            #print("El nodo {} no se ha podido borrar de la base de datos".format(self.node_info['myIP']))
         else:
-            print("El nodo {} se ha borrado correctamente de la base de datos".format(self.node_info['myIP']))
+            pass
+            #print("El nodo {} se ha borrado correctamente de la base de datos".format(self.node_info['myIP']))
 
 
 ######################### TRM OPERATIONS ##########################
@@ -84,10 +89,11 @@ class Agent:
             self.socket_leader.connect((leaderIP, port))
             self.socket_alive.connect((leaderIP, port+1))
             self.send_register_message()
-            print("Me he conectado con el agent")
+            #print("Me he conectado con el agent")
         except Exception as e:
-            print(e)
-            print("El agente no se ha podido conectar al leader")
+            pass
+            # print(e)
+            #print("El agente no se ha podido conectar al leader")
 
     def send_register_message(self):
         attributes = {
@@ -105,7 +111,7 @@ class Agent:
         self.socket_leader.send(message.encode())
 
     def send_dict(self, dict):
-        # print("Envio al leader {}".format(dict.items()))
+        # #print("Envio al leader {}".format(dict.items()))
         self.socket_leader.send(pickle.dumps(dict))
 
     def close_leader(self):
@@ -123,10 +129,10 @@ class Agent:
     def process_received_dict(self, dict):
         if dict["type"] == "service":
             self.services.append(dict)
-            # print("He recibido service {}".format(dict.items()))
+            # #print("He recibido service {}".format(dict.items()))
         elif dict["type"] == "service_result":
             # TODO IF PARA LOS DIFERENTES ESTADOS (UNATTENDEDED...)
-            print("He recibido resultado {} del servicio".format(dict.get("output")))
+            #print("He recibido resultado {} del servicio".format(dict.get("output")))
             pass
 
 ######################## SOCKET OPERATIONS ########################
