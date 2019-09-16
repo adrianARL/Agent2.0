@@ -14,8 +14,6 @@ node_info = {}
 
 def register_to_leader():
 	global leader_ip, node_info
-	if not os.path.isdir("./config"):
-		os.mkdir("./config", 0774)
 	if not os.path.exists("./config/device.config"):
 		leader_ip = input("Leader IP: ")
 		content = {}
