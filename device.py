@@ -138,6 +138,7 @@ def main():
 					value = input("\t{}: ".format(param))
 					request["params"][param] = value
 				input("\nPulsa ENTER para solicitar el servicio {}".format(service_id))
+			request["agent_ip"] = my_ip
 			result = request_service(request)
 			print("\nResultado del servicio: {}".format(result))
 			input("\nPresiona ENTER para solicitar otro servicio")
