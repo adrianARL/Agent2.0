@@ -14,9 +14,8 @@ node_info = {}
 
 def register_to_leader():
 	global leader_ip, node_info
-	if not os.path.exists("./config/device.config"):
+	if not os.path.exists("./config/device.conf"):
 		leader_ip = input("Leader IP: ")
-		content = {}
 		node_info = {
 	        "ipDB" : "10.0.2.16",
 	        "portDB" : 27017,
@@ -42,19 +41,19 @@ def register_to_leader():
 				value = input("{}: ".format(attribute))
 				node_info[attribute] = value
 		try:
-			node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
-			node_info["nodeID"] = node_id.text.zfill(10)
-			content["node_info"] = node_info
-			config = open("./config/device.config", "w")
-			json.dump(content, config)
+			if node_info["role"] != "cloud_agent":
+				node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
+				node_info["nodeID"] = node_id.text.zfill(10)
+			config = open("./config/device.conf", "w")
+			json.dump(node_info, config)
 			config.close()
 		except:
 			print("ERROR: No se ha podido conectar con el leader {}. Intentalo mas tarde.".format(leader_ip))
 	else:
-		config = open("./config/device.config", "r")
-		content = json.load(config)
-		leader_ip = content["leader_ip"]
-		node_info = content["node_info"]
+		config = open("./config/device.conf", "r")
+		node_info = json.load(config)
+
+		leader_ip = node_info.get("leader_ip")
 		config.close()
 	start_agent()
 
@@ -92,7 +91,11 @@ def convert_to_list(services):
 	return services_list
 
 def get_services():
-	services = requests.get("http://{}:8000/service".format(leader_ip)).text
+	global node_info
+	if node_info["role"] == "agent":
+		services = requests.get("http://{}:8000/service".format(leader_ip)).text
+	else:
+		services = requests.get("http://{}:8000/service".format(my_ip)).text
 	services = convert_to_list(services)
 	services = filter_services(services)
 	return services

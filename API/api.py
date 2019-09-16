@@ -218,6 +218,13 @@ class API(object):
             body['_id'] = "0"
             body["nodeID"] = "0".zfill(10)
             self.agent_collection.insert_one(body)
+            config = open("./config/device.conf", "r")
+            content = json.load(config)
+            content["nodeID"] = body["nodeID"]
+            config.close()
+            config = open("./config/device.conf", "w")
+            json.dump(content, config)
+            config.close()
         except pymongo.errors.DuplicateKeyError as e:
             pass
         except Exception as e:
