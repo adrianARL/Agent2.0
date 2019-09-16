@@ -17,7 +17,6 @@ def register_to_leader():
 	if not os.path.exists("./config/device.config"):
 		leader_ip = input("Leader IP: ")
 		content = {}
-		content["leader_ip"] = leader_ip
 		node_info = {
 	        "ipDB" : "10.0.2.16",
 	        "portDB" : 27017,
