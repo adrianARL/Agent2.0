@@ -12,6 +12,10 @@ leader_ip = None
 my_ip = subprocess.getoutput("hostname -I | awk '{print $1}'")
 node_info = {}
 
+def prRed(skk): print("Estado: \033[91m{}\033[00m" .format(skk))
+
+def prGreen(skk): print("Estado: \033[92m{}\033[00m" .format(skk)) 
+
 def register_to_leader():
 	global leader_ip, node_info
 	if not os.path.exists("./config/device.conf"):
@@ -102,12 +106,27 @@ def get_services():
 
 def request_service(service):
 	result = requests.post("http://{}:8000/request_service".format(my_ip), json=service).text
+	result = json.loads(result)
 	return result
 
 def find_service(services, service_id):
 	for service in services:
 		if service["_id"] == service_id:
 			return service
+
+def show_result(result, service_id):
+	os.system("clear")
+	print("RESULTADO DEL SERVICIO {}:\n".format(service_id))
+	if result["status"] == "success":
+		prGreen("{}".format(result["status"]))
+	else:
+		prRed("{}".format(result["status"]))
+	try:
+		output = json.loads(result["output"])
+		for key, value in output.items():
+			print("{}: {}".format(key, value))
+	except:
+		pass
 
 def generate_service_list(services):
 	services_list = []
@@ -132,7 +151,6 @@ def main():
 			request["params"] = {}
 			if service.get("params"):
 				os.system("clear")
-				print("Servicio: {}".format(service_id))
 				print("Introduce los parametros del servicio: ")
 				params = service["params"]
 				request["params"] = params
@@ -142,7 +160,7 @@ def main():
 				input("\nPulsa ENTER para solicitar el servicio {}".format(service_id))
 			request["agent_ip"] = my_ip
 			result = request_service(request)
-			print("\nResultado del servicio: {}".format(result))
+			show_result(result, service_id)
 			input("\nPresiona ENTER para solicitar otro servicio")
 			os.system("clear")
 		else:
