@@ -55,6 +55,7 @@ def register_to_leader():
                         config.close()
                 except:
                         print("ERROR: No se ha podido conectar con el leader {}. Intentalo mas tarde.".format(leader_ip))
+                        exit(1)
         else:
                 config = open("./config/device.conf", "r")
                 node_info = json.load(config)
