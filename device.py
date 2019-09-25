@@ -22,9 +22,9 @@ default_configs = {
 
 def prRed(skk): print("Estado: \033[91m{}\033[00m" .format(skk))
 
-def prGreen(skk): print("Estado: \033[92m{}\033[00m" .format(skk)) 
+def prGreen(skk): print("Estado: \033[92m{}\033[00m" .format(skk))
 
-def prYellow(skk): print("Estado: \033[93m{}\033[00m" .format(skk)) 
+def prYellow(skk): print("Estado: \033[93m{}\033[00m" .format(skk))
 
 def register_to_leader():
         global leader_ip, node_info, default_configs
@@ -62,7 +62,7 @@ def register_to_leader():
         else:
                 config = open("./config/device.conf", "r")
                 node_info = json.load(config)
-                leader_ip = node_info.get("leader_ip")
+                leader_ip = node_info.get("leaderIP")
                 config.close()
         start_agent()
 
@@ -132,13 +132,13 @@ def show_default_configs():
                 config = input("\nQue configuracion quieres cargar?: ")
                 return config, default_configs[config]
         return None, []
-                
+
 def show_available_iots():
         global available_iots
         print("IoT's disponibles:")
         for iot in available_iots:
                 print("\t- {}".format(iot))
-                
+
 def show_result(result, service_id):
         os.system("clear")
         print("RESULTADO DEL SERVICIO {}:\n".format(service_id))

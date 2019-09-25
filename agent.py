@@ -29,7 +29,7 @@ class Agent:
         if self.node_info["role"] == "cloud_agent":
             self.API.register_cloud_agent()
         self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
-        self.API.start(silent_access=True)
+        self.API.start(silent_access=False)
 
 
     def get_attributes(self):
