@@ -15,13 +15,16 @@ available_iots = ["mapa", "motor", "wheels", "rfid_sensor", "line_sensor", "ultr
 default_configs = {
         "ambulancia": ["motor", "wheels", "rfid_sensor", "line_sensor", "ultrasonic_sensor", "siren"],
         "camion_basura": ["motor", "wheels", "rfid_sensor", "line_sensor", "ultrasonic_sensor"],
-        "gestor_semaforos": ["semaforo"],
-        "gestor_farolas": ["farola"]
+        "gestor_semaforos": ["semaforo", "mapa"],
+        "gestor_farolas": ["farola", "mapa"],
+        "gestor_trafico": ["mapa"]
 }
 
 def prRed(skk): print("Estado: \033[91m{}\033[00m" .format(skk))
 
 def prGreen(skk): print("Estado: \033[92m{}\033[00m" .format(skk)) 
+
+def prYellow(skk): print("Estado: \033[93m{}\033[00m" .format(skk)) 
 
 def register_to_leader():
         global leader_ip, node_info, default_configs
@@ -104,7 +107,7 @@ def get_services():
                 try:
                         services = requests.get("http://{}:8000/service".format(my_ip)).text
                 except:
-                        get_services()
+                        return get_services()
         services = convert_to_list(services)
         services = filter_services(services)
         return services
@@ -141,7 +144,9 @@ def show_result(result, service_id):
         print("RESULTADO DEL SERVICIO {}:\n".format(service_id))
         if result["status"] == "success":
                 prGreen("{}".format(result["status"]))
-        else:
+        elif result["status"] == "error":
+                prYellow("{}".format(result["status"]))
+        elif result["status"] == "unattended":
                 prRed("{}".format(result["status"]))
         try:
                 output = json.loads(result["output"])
@@ -153,7 +158,7 @@ def show_result(result, service_id):
 def generate_service_list(services):
         services_list = []
         for service in services:
-                services_list.append("{}:{}".format(service["_id_"], service["description"]))
+                services_list.append("{}:{}".format(service["_id"], service["description"]))
 
         return services_list
 
@@ -168,7 +173,7 @@ def main():
                 service_id, index = pick(services_list, title, indicator="=>")
                 request = {}
                 if service_id != "EXIT":
-                        service_id = service_id.split(':')[1]
+                        service_id = service_id.split(':')[0]
                         service = find_service(services, service_id)
                         request["service_id"] = service_id
                         request["params"] = {}
