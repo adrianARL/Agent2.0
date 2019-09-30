@@ -11,12 +11,13 @@ from pick import pick
 leader_ip = None
 my_ip = subprocess.getoutput("hostname -I | awk '{print $1}'")
 node_info = {}
-available_iots = ["mapa", "motor", "wheels", "rfid_sensor", "line_sensor", "ultrasonic_sensor", "semaforo", "farola", "siren"]
+available_iots = ["mapa", "motor", "wheels", "rfid_sensor", "line_sensor", "ultrasonic_sensor", "semaforos_A", "farolas_A", "siren"]
 default_configs = {
         "ambulancia": ["motor", "wheels", "rfid_sensor", "line_sensor", "ultrasonic_sensor", "siren"],
         "camion_basura": ["motor", "wheels", "rfid_sensor", "line_sensor", "ultrasonic_sensor"],
-        "gestor_semaforos": ["semaforo", "mapa"],
-        "gestor_farolas": ["farola", "mapa"],
+        "gestor_semaforos": ["semaforos_A", "mapa"],
+        "gestor_total": ["semaforos_A", "farolas_A", "mapa"],
+        "gestor_farolas": ["farolas_A", "mapa"],
         "gestor_trafico": ["mapa"]
 }
 
