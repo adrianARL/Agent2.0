@@ -154,7 +154,7 @@ def show_result(result, service_id):
                 for key, value in output.items():
                         print("{}: {}".format(key, value))
         except:
-                pass
+                print("Resultado: {}".format(output))
 
 def generate_service_list(services):
         services_list = []
