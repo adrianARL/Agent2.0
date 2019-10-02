@@ -87,6 +87,9 @@ class RunTime:
         params = service.get("params")
         ##print("PARAMS:", params)
         result = ""
+        result += "download_host=" + service["download_host"] + " "
+        result += "download_port=" + str(service["download_port"]) + " "
+        result += "agent_id=" + self.agent.node_info["nodeID"] + " "
         if params:
             for key, value in params.items():
                 if value:
@@ -102,7 +105,7 @@ class RunTime:
         return result
 
     def execute_code(self, python_version, code, params):
-        ##print("Voy a ejecutar:\n{}\n{}\n{}".format(python_version, code, params))
+        print("Voy a ejecutar:\n{}\n{}\n{}".format(python_version, code, params))
         if params:
             ##print("HAY PARAMS")
             output = subprocess.getoutput(python_version + " ./codes/" + code + " " + params)

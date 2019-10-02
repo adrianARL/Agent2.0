@@ -80,12 +80,17 @@ class ServiceExecution:
 
     def get_params_from_result(self, service, result):
         if "status" in result.keys() and result["status"] == "success" and "output" in result.keys():
-            result["output"] = json.loads(result["output"])
-            if "params" not in service.keys():
-                service["params"] = result["output"]
-            else:
-                for key, value in result["output"].items():
-                    service["params"][key] = value
+            print("Resultado: ", result)
+            print(type(result["output"]))
+            try:
+                result["output"] = json.loads(result["output"])
+                if "params" not in service.keys():
+                    service["params"] = result["output"]
+                else:
+                    for key, value in result["output"].items():
+                        service["params"][key] = value
+            except:
+                print("Me ha petado con el output", result)
 
     def attend_response(self, service_response):
         if service_response["id"] in self.dependency_of.keys():
