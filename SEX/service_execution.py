@@ -29,9 +29,9 @@ class ServiceExecution:
             requester = self.get_service_requester(service)
             if requester and requester["role"] == "agent":
                 leader = self.get_active_leader_from_agent(requester)
-                if self.can_execute_service(service, leader) or self.can_execute_service(service, requester):
+                if leader and (self.can_execute_service(service, leader) or self.can_execute_service(service, requester)):
                     return self.agent.API.request_service_to_agent(service, leader["myIP"])
-                else:
+                elif service.get("params") and not service.get("params").get("agent_id"):
                     agent_to_delegate = self.find_agent_to_delegate(service)
                     if agent_to_delegate:
                         if agent_to_delegate.get("leaderID") == self.agent.node_info["nodeID"]:
@@ -76,7 +76,7 @@ class ServiceExecution:
             if len(agent_info) > 0:
                 agent_info = agent_info[0]
                 return agent_info
-        return False
+        return None
 
     def get_params_from_result(self, service, result):
         if "status" in result.keys() and result["status"] == "success" and "output" in result.keys():
