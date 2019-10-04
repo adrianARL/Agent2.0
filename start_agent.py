@@ -1,7 +1,7 @@
 import json
 import os.path
-from agent import Agent
-from leader import Leader
+from agent.agent import Agent
+from agent.leader import Leader
 
 
 if os.path.exists("./config/device.conf"):

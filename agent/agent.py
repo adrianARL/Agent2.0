@@ -4,10 +4,10 @@ import uuid
 import json
 from pathlib import Path
 from threading import Thread
-from TRM.topology_manager import TopologyManager
-from SEX.service_execution import ServiceExecution
-from RT.runtime import RunTime
-from API.api import API
+from topology_manager import TopologyManager
+from service_execution import ServiceExecution
+from runtime import RunTime
+from api import API
 
 
 class Agent:

@@ -2,7 +2,6 @@ import time
 import uuid
 import json
 from threading import Thread
-# from frontend_connection import FrontendConnection
 
 
 class ServiceExecution:
