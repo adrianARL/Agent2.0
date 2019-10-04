@@ -108,18 +108,18 @@ class RunTime:
         print("Voy a ejecutar:\n{}\n{}\n{}".format(python_version, code, params))
         if params:
             ##print("HAY PARAMS")
-            output = subprocess.getoutput(python_version + " ./codes/" + code + " " + params)
+            output = subprocess.getoutput(python_version + " /etc/agent/codes/" + code + " " + params)
             # dentro del code.py que se ejecuta para obtener params: params = sys.argv[1].split(" ")
         else:
             ##print("NO HAY PARAMS")
-            output = subprocess.getoutput(python_version + " ./codes/" + code)
+            output = subprocess.getoutput(python_version + " /etc/agent/codes/" + code)
         return output
 
     def get_remote_file(self, code, service):
-        file = open("./codes/" + code, 'wb')
+        file = open("/etc/agent/codes/" + code, 'wb')
         content = requests.get("http://{}:{}/download/{}".format(service["download_host"], service["download_port"], code)).content
         file.write(content)
         file.close()
 
     def has_service_code(self, code):
-        return os.path.isfile("./codes/" + code)
+        return os.path.isfile("/etc/agent/codes/" + code)
