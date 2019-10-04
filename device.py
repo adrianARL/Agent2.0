@@ -30,7 +30,7 @@ def prYellow(skk): print("Estado: \033[93m{}\033[00m" .format(skk))
 def register_to_leader():
         global leader_ip, node_info, default_configs
         devices_list = ["{}:{}".format(device, default_configs[device]) for device in default_configs.keys()]
-        if not os.path.exists("./config/device.conf"):
+        if not os.path.exists("/etc/agent/device.conf"):
                 leader_ip = input("Leader IP: ")
                 node_info = {
                         "ipDB" : "10.0.2.16",
@@ -54,14 +54,14 @@ def register_to_leader():
                         if node_info["role"] != "cloud_agent":
                                 node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
                                 node_info["nodeID"] = node_id.text.zfill(10)
-                        config = open("./config/device.conf", "w")
+                        config = open("/etc/agent/device.conf", "w")
                         json.dump(node_info, config)
                         config.close()
                 except:
                         print("ERROR: No se ha podido conectar con el leader {}. Intentalo mas tarde.".format(leader_ip))
                         exit(1)
         else:
-                config = open("./config/device.conf", "r")
+                config = open("/etc/agent/device.conf", "r")
                 node_info = json.load(config)
                 leader_ip = node_info.get("leaderIP")
                 config.close()

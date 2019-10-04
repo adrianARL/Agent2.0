@@ -33,9 +33,9 @@ class Agent:
 
 
     def get_attributes(self):
-        config_file = Path("./config/agent.conf")
+        config_file = Path("/etc/agent/agent.conf")
         if config_file.is_file():
-            with open("./config/agent.conf") as fp:
+            with open("/etc/agent/agent.conf") as fp:
                 content = json.load(fp)
                 for key, value in content.items():
                     self.node_info[key] = value

@@ -153,7 +153,7 @@ class API(object):
                     self.register_agent(self.agent.node_info)
                     status_code = 200
             if status_code == 200:
-                file = open("./config/agent.conf", "w")
+                file = open("/etc/agent/agent.conf", "w")
                 json.dump({"nodeID": self.agent.node_info["nodeID"]}, file)
                 file.close()
                 #print("Se ha registrado el agent correctamente con id {}".format(self.agent.node_info["nodeID"]))
@@ -218,11 +218,11 @@ class API(object):
             body['_id'] = "0"
             body["nodeID"] = "0".zfill(10)
             self.agent_collection.insert_one(body)
-            config = open("./config/device.conf", "r")
+            config = open("/etc/agent/device.conf", "r")
             content = json.load(config)
             content["nodeID"] = body["nodeID"]
             config.close()
-            config = open("./config/device.conf", "w")
+            config = open("/etc/agent/device.conf", "w")
             json.dump(content, config)
             config.close()
         except pymongo.errors.DuplicateKeyError as e:
