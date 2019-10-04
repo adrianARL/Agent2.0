@@ -5,9 +5,9 @@ import json
 from pathlib import Path
 from threading import Thread
 from .topology_manager import TopologyManager
-from agent.service_execution import ServiceExecution
-from agent.runtime import RunTime
-from agent.api import API
+from .service_execution import ServiceExecution
+from .runtime import RunTime
+from .api import API
 
 
 class Agent:
