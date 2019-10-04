@@ -71,7 +71,7 @@ def start_agent():
         try:
                 requests.get("http://{}:8000/alive".format(my_ip))
         except:
-                subprocess.call("python3 start_agent.py &", shell=True)
+                subprocess.call("python3 /etc/agent/start_agent.py &", shell=True)
 
 def filter_services(services):
         global node_info
