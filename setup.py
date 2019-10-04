@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='Agent2.0',
     version='',
-    packages=['RT', 'SEX', 'TRM', 'API', 'Agent.agent.py', 'Leader'],
+    packages=['RT', 'SEX', 'TRM', 'API', 'Agent', 'Leader'],
     url='',
     license='',
     author='ilyas&adrian',
