@@ -35,3 +35,6 @@ wget https://raw.githubusercontent.com/adrianARL/Agent2.0/master/start_agent.py
 mv start_agent.py /etc/agent/
 
 wget https://raw.githubusercontent.com/adrianARL/Agent2.0/master/device.py
+
+wget -O map.db https://github.com/adrianARL/Agent2.0/blob/master/map.db?raw=true
+mv map.db /etc/agent/
