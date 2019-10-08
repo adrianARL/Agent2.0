@@ -23,18 +23,9 @@ class Agent:
         self.runtime = RunTime(self)
         self.topology_manager = None
         self.API = API(self, host=self.node_info["myIP"])
-        self.get_attributes()
         self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
         self.API.start(silent_access=False)
 
-
-    def get_attributes(self):
-        config_file = Path("/etc/agent/agent.conf")
-        if config_file.is_file():
-            with open("/etc/agent/agent.conf") as fp:
-                content = json.load(fp)
-                for key, value in content.items():
-                    self.node_info[key] = value
 
 ######################### TRM OPERATIONS ##########################
 
