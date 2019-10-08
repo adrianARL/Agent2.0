@@ -105,6 +105,7 @@ class API(object):
                         agent_list.append(agent_mongo)
                 return agent_list
             except Exception as e:
+                return []
                 pass
                 #print(e)
 
