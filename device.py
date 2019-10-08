@@ -58,8 +58,9 @@ def register_to_leader():
                         config = open("/etc/agent/config/device.config", "w")
                         json.dump(node_info, config)
                         config.close()
-                except:
-                        print("ERROR: No se ha podido conectar con el leader {}. Intentalo mas tarde.".format(leader_ip))
+                except Exception as e:
+                        # print("ERROR: No se ha podido conectar con el leader {}. Intentalo mas tarde.".format(leader_ip))
+                        print(e)
                         exit(1)
         else:
                 config = open("/etc/agent/config/device.config", "r")
