@@ -14,15 +14,15 @@ sudo apt-get install npm -y
 sudo apt-get install git -y
 
 
-sudo pip install pick --upgrade
-sudo pip install psutil --upgrade
+sudo pip install pick
+sudo pip install psutil
 
-sudo pip3 install pick --upgrade
-sudo pip3 install psutil --upgrade
-sudo pip3 install cherrypy --upgrade
+sudo pip3 install pick
+sudo pip3 install psutil
+sudo pip3 install cherrypy
 sudo pip3 install hug==2.4.1
-sudo pip3 install pymongo --upgrade
-sudo pip3 install hug_middleware_cors --upgrade
+sudo pip3 install pymongo
+sudo pip3 install hug_middleware_cors
 
 sudo pip3 install git+https://github.com/adrianARL/Agent2.0.git
 
