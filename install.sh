@@ -25,3 +25,12 @@ sudo pip3 install pymongo --upgrade
 sudo pip3 install hug_middleware_cors --upgrade
 
 sudo pip3 install git+https://github.com/adrianARL/Agent2.0.git
+
+sudo mkdir /etc/agent
+sudo mkdir /etc/agent/codes
+sudo mkdir /etc/agent/config
+
+wget https://raw.githubusercontent.com/adrianARL/Agent2.0/master/start_agent.py
+mv start_agent.py /etc/agent/
+
+wget https://raw.githubusercontent.com/adrianARL/Agent2.0/master/device.py
