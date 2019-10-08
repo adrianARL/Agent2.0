@@ -54,14 +54,14 @@ def register_to_leader():
                         if node_info["role"] != "cloud_agent":
                                 node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
                                 node_info["nodeID"] = node_id.text.zfill(10)
-                        config = open("/etc/agent/device.conf", "w")
+                        config = open("/etc/agent/device.config", "w")
                         json.dump(node_info, config)
                         config.close()
                 except:
                         print("ERROR: No se ha podido conectar con el leader {}. Intentalo mas tarde.".format(leader_ip))
                         exit(1)
         else:
-                config = open("/etc/agent/device.conf", "r")
+                config = open("/etc/agent/device.config", "r")
                 node_info = json.load(config)
                 leader_ip = node_info.get("leaderIP")
                 config.close()
