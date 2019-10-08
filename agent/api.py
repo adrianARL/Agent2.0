@@ -84,6 +84,7 @@ class API(object):
     def register_agent(self, body):
         try:
             nodeID = self.agent_collection.find_and_modify(query= { '_id': 'nodeID' },update= { '$inc': {'seq': 1}}, new=True ).get('seq')
+            print("NODE ID: {}".format(nodeID))
             body['_id'] = str(int(nodeID))
             body['nodeID'] = str(int(nodeID)).zfill(10)
             body['leaderID'] = self.agent.node_info["nodeID"]
