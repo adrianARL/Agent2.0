@@ -104,7 +104,7 @@ def get_services():
         global node_info
         if node_info["role"] == "agent":
                 services = requests.get("http://{}:8000/service".format(leader_ip)).text
-        else:
+        elif node_info["role"] == "leader":
                 try:
                         services = requests.get("http://{}:8000/service".format(my_ip)).text
                 except:
@@ -165,37 +165,38 @@ def generate_service_list(services):
 
 def main():
         register_to_leader()
-        services = get_services()
-        services_list = generate_service_list(services)
-        services_list.append("EXIT")
-        os.system("clear")
-        while True:
-                title = "Elige un servicio a solicitar:"
-                service_id, index = pick(services_list, title, indicator="=>")
-                request = {}
-                if service_id != "EXIT":
-                        service_id = service_id.split(':')[0]
-                        service = find_service(services, service_id)
-                        request["service_id"] = service_id
-                        request["params"] = {}
-                        if service.get("params"):
-                                os.system("clear")
-                                print("Introduce los parametros del servicio: ")
-                                params = service["params"]
-                                request["params"] = params
-                                for param in params:
-                                        value = input("\t{}: ".format(param))
-                                        request["params"][param] = value
-                                input("\nPulsa ENTER para solicitar el servicio {}".format(service_id))
-                        request["agent_ip"] = my_ip
-                        result = request_service(request)
-                        show_result(result, service_id)
-                        input("\nPresiona ENTER para solicitar otro servicio")
-                        os.system("clear")
-                else:
-                        os.system("clear")
-                        print("Has salido del programa")
-                        break
+        if node_info["role"] != "cloud_agent":
+            services = get_services()
+            services_list = generate_service_list(services)
+            services_list.append("EXIT")
+            os.system("clear")
+            while True:
+                    title = "Elige un servicio a solicitar:"
+                    service_id, index = pick(services_list, title, indicator="=>")
+                    request = {}
+                    if service_id != "EXIT":
+                            service_id = service_id.split(':')[0]
+                            service = find_service(services, service_id)
+                            request["service_id"] = service_id
+                            request["params"] = {}
+                            if service.get("params"):
+                                    os.system("clear")
+                                    print("Introduce los parametros del servicio: ")
+                                    params = service["params"]
+                                    request["params"] = params
+                                    for param in params:
+                                            value = input("\t{}: ".format(param))
+                                            request["params"][param] = value
+                                    input("\nPulsa ENTER para solicitar el servicio {}".format(service_id))
+                            request["agent_ip"] = my_ip
+                            result = request_service(request)
+                            show_result(result, service_id)
+                            input("\nPresiona ENTER para solicitar otro servicio")
+                            os.system("clear")
+                    else:
+                            os.system("clear")
+                            print("Has salido del programa")
+                            break
 
 
 if __name__ == '__main__':
