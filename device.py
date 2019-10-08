@@ -51,7 +51,7 @@ def register_to_leader():
                 try:
                         if node_info["role"] != "cloud_agent":
                                 info = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
-                                info = json.loads(info)
+                                info = info.json()
                                 node_info["nodeID"] = info["nodeID"]
                                 node_info["ipDB"] = info["ipDB"]
                                 node_info["portDB"] = info["portDB"]
