@@ -4,7 +4,7 @@ import pickle
 import time
 import errno
 from threading import Thread
-from agent import Agent
+from .agent import Agent
 
 
 
