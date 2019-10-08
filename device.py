@@ -30,7 +30,7 @@ def prYellow(skk): print("Estado: \033[93m{}\033[00m" .format(skk))
 def register_to_leader():
         global leader_ip, node_info, default_configs
         devices_list = ["{}:{}".format(device, default_configs[device]) for device in default_configs.keys()]
-        if not os.path.exists("/etc/agent/device.conf"):
+        if not os.path.exists("/etc/agent/device.config"):
                 leader_ip = input("Leader IP: ")
                 node_info = {
                         "ipDB" : "10.0.2.16",
