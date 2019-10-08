@@ -107,6 +107,7 @@ class API(object):
             except Exception as e:
                 return []
                 pass
+        return []
                 #print(e)
 
     def delete_agent(self, selec):
