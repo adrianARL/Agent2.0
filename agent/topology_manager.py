@@ -26,7 +26,7 @@ class TopologyManager:
             for agent in agents:
                 self.agent.agents_alive[agent["myIP"]] = agent["status"]
         except Exception as e:
-            print(e)
+            print("PENE")
             pass
 
     def check_alive_agents(self):
