@@ -98,9 +98,11 @@ class API(object):
     def get_agents(self, selec=None):
         if selec:
             try:
-                agent_list=[]
-                for agent_mongo in self.agent_collection.find(selec):
-                    agent_list.append(agent_mongo)
+                agent_list = []
+                agents = self.agent_collection.find(selec)
+                if agents:
+                    for agent_mongo in agents:
+                        agent_list.append(agent_mongo)
                 return agent_list
             except Exception as e:
                 pass

@@ -23,9 +23,8 @@ class TopologyManager:
         try:
             PARAMS = {'leaderID' : self.agent.node_info["nodeID"]}
             agents = self.agent.API.get_agents(PARAMS)
-            if agents:
-                for agent in agents:
-                    self.agent.agents_alive[agent["myIP"]] = agent["status"]
+            for agent in agents:
+                self.agent.agents_alive[agent["myIP"]] = agent["status"]
         except Exception as e:
             print(e)
             pass
