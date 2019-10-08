@@ -87,11 +87,13 @@ class API(object):
             body['_id'] = str(int(nodeID))
             body['nodeID'] = str(int(nodeID)).zfill(10)
             body['leaderID'] = self.agent.node_info["nodeID"]
+            body['ipDB'] = self.agent.node_info["ipDB"]
+            body['portDB'] = self.agent.node_info["portDB"]
             self.agent_collection.insert_one(body)
             self.agent.agents_alive[body["myIP"]] = 1
         except pymongo.errors.DuplicateKeyError as e:
             nodeID = self.register_agent(body)
-        return str(int(nodeID))
+        return json.dumps(body)
 
     def get_agents(self, selec=None):
         if selec:

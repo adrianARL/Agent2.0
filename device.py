@@ -33,8 +33,6 @@ def register_to_leader():
         if not os.path.exists("/etc/agent/device.config"):
                 leader_ip = input("Leader IP: ")
                 node_info = {
-                        "ipDB" : "10.0.2.16",
-                        "portDB" : 27017,
                         "myIP" : my_ip,
                         "leaderIP" : leader_ip,
                         "port" : 5000,
@@ -52,8 +50,11 @@ def register_to_leader():
                 node_info["role"] = role
                 try:
                         if node_info["role"] != "cloud_agent":
-                                node_id = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
-                                node_info["nodeID"] = node_id.text.zfill(10)
+                                info = requests.post("http://{}:8000/register_agent".format(leader_ip), json=node_info)
+                                info = json.loads(info)
+                                node_info["nodeID"] = info["nodeID"]
+                                node_info["ipDB"] = info["ipDB"]
+                                node_info["portDB"] = info["portDB"]
                         config = open("/etc/agent/device.config", "w")
                         json.dump(node_info, config)
                         config.close()
