@@ -4,8 +4,8 @@ from agent.agent import Agent
 from agent.leader import Leader
 
 
-if os.path.exists("/etc/agent/config/device.configig"):
-	config = open("/etc/agent/config/device.configig", "r")
+if os.path.exists("/etc/agent/config/device.config"):
+	config = open("/etc/agent/config/device.config", "r")
 	node_info = json.load(config)
 
 	if node_info["role"] == "agent":
