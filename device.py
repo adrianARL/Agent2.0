@@ -146,9 +146,9 @@ def show_result(result, service_id):
         print("RESULTADO DEL SERVICIO {}:\n".format(service_id))
         if result["status"] == "success":
                 prGreen("{}".format(result["status"]))
-        elif result["status"] == "error":
-                prYellow("{}".format(result["status"]))
         elif result["status"] == "unattended":
+                prYellow("{}".format(result["status"]))
+        elif result["status"] == "error":
                 prRed("{}".format(result["status"]))
         try:
                 output = result["output"]
