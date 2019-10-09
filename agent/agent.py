@@ -24,7 +24,7 @@ class Agent:
         self.topology_manager = None
         self.API = API(self, host=self.node_info["myIP"])
         self.topology_manager = TopologyManager(self, self.node_info["ipDB"], self.node_info["portDB"])
-        self.API.start(silent_access=False)
+        self.API.start(silent_access=True)
 
 
 ######################### TRM OPERATIONS ##########################
