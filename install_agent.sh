@@ -12,6 +12,7 @@ sudo apt-get install python3-setuptools -y
 sudo apt-get install nodejs -y
 sudo apt-get install npm -y
 sudo apt-get install git -y
+sudo apt-get install sqlite3 -y
 
 
 sudo pip install pick
