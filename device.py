@@ -144,7 +144,6 @@ def show_available_iots():
 def show_result(result, service_id):
         os.system("clear")
         print("RESULTADO DEL SERVICIO {}:\n".format(service_id))
-        output = result["output"]
         if result["status"] == "success":
                 prGreen("{}".format(result["status"]))
         elif result["status"] == "error":
@@ -152,11 +151,12 @@ def show_result(result, service_id):
         elif result["status"] == "unattended":
                 prRed("{}".format(result["status"]))
         try:
+                output = result["output"]
                 output = json.loads(output)
                 for key, value in output.items():
                         print("{}: {}".format(key, value))
         except:
-                print("Resultado: {}".format(output))
+                print("Resultado: {}".format(result.get("output")))
 
 def generate_service_list(services):
         services_list = []
