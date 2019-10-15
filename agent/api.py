@@ -19,7 +19,7 @@ class API(object):
             self.service_catalog = client.globalDB.service_catalog
         today = datetime.date.today()
 
-    cherrypy.tools.json_out()
+    @cherrypy.tools.json_out()
     def GET(self, obj=None, id=None):
         if obj == "agent":
             return self.get_agents(id)
