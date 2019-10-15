@@ -99,9 +99,8 @@ class API(object):
     def get_agents(self, selec=None):
         if selec:
             if type(selec) is str:
-                agents = self.agent_collection.find_one(selec)
-            else:
-                agents = self.agent_collection.find(selec);
+                selec = json.loads(selec)
+            agents = self.agent_collection.find(selec);
             return agents
         else:
             agents = self.agent_collection.find();
