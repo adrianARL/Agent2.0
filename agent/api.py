@@ -101,10 +101,14 @@ class API(object):
             if type(selec) is str:
                 selec = json.loads(selec)
             agents = self.agent_collection.find(selec);
+            if agents:
+                agents = list(agents)
             return agents
         else:
             agents = self.agent_collection.find();
-            return list(agents)
+            if agents:
+                agents = list(agents)
+            return agents
 
     def delete_agent(self, selec):
         self.agent_collection.delete_one(selec)
