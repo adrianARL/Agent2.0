@@ -4,7 +4,6 @@ import os
 import subprocess
 import json
 import psutil
-import ast
 from pick import pick
 
 
@@ -83,34 +82,15 @@ def filter_services(services):
                         result.append(service)
         return result
 
-def convert_to_list(services):
-        count = 0
-        services_list = []
-        current_service = ""
-        services = services[1:-1]
-        for char in services:
-                if char == "{":
-                        count += 1
-                elif char == "}":
-                        count -= 1
-                if count != 0 or char == "}":
-                        current_service += char
-                if count == 0 and len(current_service) > 0:
-                        current_service = ast.literal_eval(current_service)
-                        services_list.append(current_service)
-                        current_service = ""
-        return services_list
-
 def get_services():
         global node_info
         if node_info["role"] == "agent":
-                services = requests.get("http://{}:8000/service".format(leader_ip)).text
+                services = requests.get("http://{}:8000/service".format(leader_ip)).json()
         elif node_info["role"] == "leader":
                 try:
-                        services = requests.get("http://{}:8000/service".format(my_ip)).text
+                        services = requests.get("http://{}:8000/service".format(my_ip)).json()
                 except:
                         return get_services()
-        services = convert_to_list(services)
         services = filter_services(services)
         return services
 
