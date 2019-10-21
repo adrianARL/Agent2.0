@@ -17,6 +17,7 @@ sudo apt-get install sqlite3 -y
 
 sudo pip install pick
 sudo pip install psutil
+sudo pip install socketIO_client_nexus
 
 sudo pip3 install pick
 sudo pip3 install psutil
@@ -24,6 +25,7 @@ sudo pip3 install cherrypy
 sudo pip3 install hug==2.4.1
 sudo pip3 install pymongo
 sudo pip3 install hug_middleware_cors
+sudo pip3 install socketIO_client_nexus
 
 sudo pip3 install git+https://github.com/adrianARL/Agent2.0.git
 
